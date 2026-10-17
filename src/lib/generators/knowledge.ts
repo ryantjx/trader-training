@@ -29,6 +29,7 @@ function build(
     id: `${generatorId}-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId,
     category: 'markets',
+    subgroup: 'market-knowledge',
     tier,
     prompt,
     context,
@@ -232,6 +233,7 @@ export const knowledgeGenerators: Generator[] = [
   {
     id: 'calendar-event',
     category: 'markets',
+    subgroup: 'market-knowledge',
     tier: 1,
     about: 'Which holiday periods close which Asian markets.',
     generate: calendar,
@@ -239,6 +241,7 @@ export const knowledgeGenerators: Generator[] = [
   {
     id: 'access-channel',
     category: 'markets',
+    subgroup: 'market-knowledge',
     tier: 2,
     about: 'Stock Connect, QFII and the H/A share relationship.',
     generate: accessChannel,
@@ -246,6 +249,7 @@ export const knowledgeGenerators: Generator[] = [
   {
     id: 'central-bank',
     category: 'markets',
+    subgroup: 'market-knowledge',
     tier: 2,
     about: 'How the regional central banks differ.',
     generate: centralBank,
@@ -253,6 +257,7 @@ export const knowledgeGenerators: Generator[] = [
   {
     id: 'index-construction',
     category: 'markets',
+    subgroup: 'market-knowledge',
     tier: 2,
     about: 'Index construction and membership.',
     generate: indexMembership,

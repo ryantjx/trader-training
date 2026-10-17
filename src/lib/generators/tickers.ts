@@ -109,6 +109,7 @@ function build(
     id: `${generatorId}-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId,
     category: 'markets',
+    subgroup: 'tickers',
     tier,
     prompt,
     context,
@@ -252,6 +253,7 @@ export const tickerGenerators: Generator[] = [
   {
     id: 'ticker-name',
     category: 'markets',
+    subgroup: 'tickers',
     tier: 1,
     about: 'Ticker to company name.',
     generate: nameFromTicker,
@@ -259,6 +261,7 @@ export const tickerGenerators: Generator[] = [
   {
     id: 'ticker-sector',
     category: 'markets',
+    subgroup: 'tickers',
     tier: 1,
     about: 'Ticker to sector.',
     generate: sectorFromTicker,
@@ -266,6 +269,7 @@ export const tickerGenerators: Generator[] = [
   {
     id: 'ticker-cap-band',
     category: 'markets',
+    subgroup: 'tickers',
     tier: 2,
     about: 'Ticker to market-cap band.',
     generate: capBandFromTicker,
@@ -273,6 +277,7 @@ export const tickerGenerators: Generator[] = [
   {
     id: 'ticker-index-membership',
     category: 'markets',
+    subgroup: 'tickers',
     tier: 2,
     about: 'Whether a name is in the STI.',
     generate: indexMembership,
@@ -280,6 +285,7 @@ export const tickerGenerators: Generator[] = [
   {
     id: 'ticker-liquidity',
     category: 'markets',
+    subgroup: 'tickers',
     tier: 3,
     about: 'Ticker to average daily turnover band.',
     generate: liquidityBand,
@@ -287,6 +293,7 @@ export const tickerGenerators: Generator[] = [
   {
     id: 'ticker-hedgeability',
     category: 'markets',
+    subgroup: 'tickers',
     tier: 4,
     about: 'What listed hedge exists for a single-name position.',
     generate: hedgeability,

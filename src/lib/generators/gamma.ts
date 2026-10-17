@@ -62,6 +62,7 @@ function gammaOnly(rng: Rng, tier: Tier): Question {
     id: id(rng),
     generatorId: 'gamma-pnl',
     category: 'math',
+    subgroup: 'greeks',
     tier,
     prompt: `Your book carries a gamma of ${gamma.toLocaleString('en-US')} on the ${indexName}, quoted in dollars per 1 percentage point move in the index. The index is at ${indexLevel.toLocaleString('en-US')} and moves ${movePct}%. What is the gamma PnL, in dollars?`,
     context: 'Gamma is quoted per 1 percentage point, not per 1.00 of spot.',
@@ -88,6 +89,7 @@ function deltaPlusGamma(rng: Rng, tier: Tier): Question {
     id: id(rng),
     generatorId: 'delta-gamma-pnl',
     category: 'math',
+    subgroup: 'greeks',
     tier,
     prompt: `Your book is long ${delta.toLocaleString('en-US')} delta and ${gamma.toLocaleString('en-US')} gamma on the ${indexName}, both quoted in dollars per 1 percentage point move. The index moves ${movePct}% in your favour. What is the total PnL, in dollars?`,
     context:
@@ -122,6 +124,7 @@ function fullAttribution(rng: Rng, tier: Tier): Question {
     id: id(rng),
     generatorId: 'pnl-attribution',
     category: 'math',
+    subgroup: 'greeks',
     tier,
     prompt: `Overnight, the ${indexName} moved ${movePct}% and implied vol rose ${volMove} points over ${days} calendar day${days > 1 ? 's' : ''}. Your book: delta ${delta.toLocaleString('en-US')}, gamma ${gamma.toLocaleString('en-US')}, vega ${vega.toLocaleString('en-US')} per vol point, theta ${theta.toLocaleString('en-US')} per day. What is the total PnL, in dollars?`,
     context:
@@ -150,6 +153,7 @@ function expectedMove(rng: Rng, tier: Tier): Question {
     id: id(rng),
     generatorId: 'expected-move',
     category: 'math',
+    subgroup: 'greeks',
     tier,
     prompt: `The ${index.name} is at ${index.level.toLocaleString('en-US')} and one-month implied vol is ${vol}%. Using the standard approximation, what is the one-day expected move as a percentage of spot, to the nearest 0.01%?`,
     context: 'One-day move is approximately annual vol divided by 16, because there are roughly 256 trading days in a year.',
@@ -175,6 +179,7 @@ function deltaPnlOnly(rng: Rng, tier: Tier): Question {
     id: id(rng),
     generatorId: 'delta-pnl',
     category: 'math',
+    subgroup: 'greeks',
     tier,
     prompt: `You are long ${delta.toLocaleString('en-US')} delta on the ${index.name}, quoted in dollars per 1 percentage point move. The index moves ${movePct}%. What is the delta PnL, in dollars?`,
     context: 'Delta is quoted per 1 percentage point move.',
@@ -193,6 +198,7 @@ export const gammaGenerators: Generator[] = [
   {
     id: 'gamma-pnl',
     category: 'math',
+    subgroup: 'greeks',
     tier: 1,
     about: 'Gamma PnL from a gamma quoted per 1 percentage point and a percentage move.',
     generate: gammaOnly,
@@ -200,6 +206,7 @@ export const gammaGenerators: Generator[] = [
   {
     id: 'delta-pnl',
     category: 'math',
+    subgroup: 'greeks',
     tier: 1,
     about: 'Delta PnL, to keep the unit convention of a Greek quoted "per 1pp" sharp.',
     generate: deltaPnlOnly,
@@ -207,6 +214,7 @@ export const gammaGenerators: Generator[] = [
   {
     id: 'expected-move',
     category: 'math',
+    subgroup: 'greeks',
     tier: 2,
     about: 'One-day and one-week expected move from annualised vol (vol/16 and vol/7).',
     generate: expectedMove,
@@ -214,6 +222,7 @@ export const gammaGenerators: Generator[] = [
   {
     id: 'delta-gamma-pnl',
     category: 'math',
+    subgroup: 'greeks',
     tier: 3,
     about: 'Total PnL split into the linear delta term and the quadratic gamma term.',
     generate: deltaPlusGamma,
@@ -221,6 +230,7 @@ export const gammaGenerators: Generator[] = [
   {
     id: 'pnl-attribution',
     category: 'math',
+    subgroup: 'greeks',
     tier: 4,
     about: 'Full overnight attribution across delta, gamma, vega and theta.',
     generate: fullAttribution,

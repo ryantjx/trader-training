@@ -20,18 +20,36 @@ export default defineConfig({
         { icon: 'github', label: 'GitHub', href: 'https://github.com/ryantjx/trader-training' },
       ],
       sidebar: [
+        { label: '1 Today', link: '/' },
         {
-          label: 'Quizzes',
+          label: '2 Math',
           items: [
-            { label: 'Today', link: '/' },
-            { label: 'Math', link: '/drill/math' },
-            { label: 'Markets', link: '/drill/markets' },
-            { label: 'Asia Derivatives', link: '/drill/derivatives' },
-            { label: 'Put-call parity', link: '/parity' },
+            { label: 'Greeks and PnL', link: '/quiz/greeks' },
+            { label: 'Put-call parity', link: '/quiz/put-call-parity' },
+            { label: 'Basis points and money', link: '/quiz/basis-points' },
+            { label: 'FX', link: '/quiz/fx' },
+            { label: 'Forwards', link: '/quiz/forwards' },
+            { label: 'Vol and strikes', link: '/quiz/vol' },
           ],
         },
         {
-          label: 'Content',
+          label: '3 Markets',
+          items: [
+            { label: 'Microstructure', link: '/quiz/microstructure' },
+            { label: 'Tickers', link: '/quiz/tickers' },
+            { label: 'Market knowledge', link: '/quiz/market-knowledge' },
+          ],
+        },
+        {
+          label: '4 Asia Derivatives',
+          items: [
+            { label: 'Listed derivatives', link: '/quiz/listed' },
+            { label: 'Exotic options', link: '/quiz/exotic' },
+            { label: 'Vol surface and skew', link: '/quiz/vol-surface' },
+          ],
+        },
+        {
+          label: '5 Content',
           items: [
             { label: 'SGX', link: '/reference/sgx' },
             { label: 'HKEX', link: '/reference/hkex' },
@@ -39,8 +57,8 @@ export default defineConfig({
             { label: 'ASX', link: '/reference/asx' },
           ],
         },
-        { label: 'Progress', link: '/stats' },
-        { label: 'About', link: '/about' },
+        { label: '6 Progress', link: '/stats' },
+        { label: '7 About', link: '/about' },
       ],
       customCss: ['./src/styles/custom.css'],
     }),

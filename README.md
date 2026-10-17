@@ -10,6 +10,10 @@ The content is organised into **three groups** — **Math**, **Markets** and **A
 3 Asia Derivatives   listed contracts and OTC exotics           -> 13 generators
 ```
 
+Each group is split into **individual quizzes**, and each quiz is its own page: `/quiz/greeks`,
+`/quiz/fx`, `/quiz/put-call-parity`, and so on. The sidebar lists them under numbered groups, and
+`/group/1-math` (or `2-markets`, `3-asia-derivatives`) gives a mixed drill across a whole group.
+
 The site is focused on the **quizzes**. Content supports them: every quiz states the method, a rule of thumb and a source, so the material is delivered at the point of answering rather than in a separate reading list. The one exception is the market-structure reference in section 2.3, which exists because microstructure is genuinely reading-first. The emphasis throughout is on the Asian exotic-options desk: HSI and HSCEI, Nikkei 225, TOPIX, KOSPI 200, FTSE China A50, GIFT Nifty and MSCI structures; the OTC exotics sold on top of them; and the cash-market and microstructure constraints that decide what can actually be hedged.
 
 # 1 Math
@@ -17,11 +21,16 @@ The site is focused on the **quizzes**. Content supports them: every quiz states
 Timed, calculator-free drills. The objective is fluency: the ability to produce a defensible number
 in a few seconds and to know the order of magnitude before computing.
 
-**Generators in this group:** `gamma-pnl`, `delta-pnl`, `expected-move`, `delta-gamma-pnl`,
-`pnl-attribution`, `put-call-parity`, `put-call-parity-structure`, `bp-to-money`, `money-to-bp`,
-`index-bps-to-money`, `fx-conversion`, `fx-triangulation`, `fx-pip-value`, `fx-recall-level`
-(disabled until the frozen data is verified), `forward-rate`, `forward-premium`, `forward-roll-cost`,
-`vega-pnl`, `price-move-to-vol`, `delta-strike`, `breakeven-vol`.
+**Quizzes in this group** (each is its own page under `/quiz/`):
+
+| Quiz | Generators |
+| --- | --- |
+| Greeks and PnL | `gamma-pnl`, `delta-pnl`, `expected-move`, `delta-gamma-pnl`, `pnl-attribution` |
+| Put-call parity | `put-call-parity`, `put-call-parity-structure` |
+| Basis points and money | `bp-to-money`, `money-to-bp`, `index-bps-to-money` |
+| FX | `fx-conversion`, `fx-triangulation`, `fx-pip-value`, `fx-recall-level` (disabled until the frozen data is verified) |
+| Forwards | `forward-rate`, `forward-premium`, `forward-roll-cost` |
+| Vol and strikes | `vega-pnl`, `price-move-to-vol`, `delta-strike`, `breakeven-vol` |
 
 ## 1.1 Calculating gamma (and the other Greeks)
 
@@ -157,7 +166,7 @@ $$\sigma_{t_1 \to t_2}^2 = \frac{\sigma_{0 \to t_2}^2\, t_2 - \sigma_{0 \to t_1}
 
 **Quiz mechanics.** Numeric entry for vega PnL, the vol-equivalent of a price move, the delta-strike and the breakeven vol; multiple-choice for the unit convention; and a round that supplies a term structure and asks for the forward vol over a stated window. Score on speed and on being right to the nearest vol point or the nearest index point.
 
-## 1.6 Put-call parity game
+## 1.6 Put-call parity
 
 **Source artifact.** `https://claude.ai/public/artifacts/956f25f7-129e-4d65-b31b-3bcfd41aae35` (moontower). Keep this game to the **standard** form of the artifact: do not add exotic extensions here. No negative option values are allowed.
 
@@ -201,10 +210,13 @@ Microstructure, ticker recall and market knowledge for HK, JP, SG and AU. This i
 one genuinely reading-first component: microstructure rewards knowing the rules before practising
 them, so a **one-page market-structure summary per market** supports the quizzes here.
 
-**Generators in this group:** `ticker-name`, `ticker-sector`, `ticker-cap-band`,
-`ticker-index-membership`, `ticker-liquidity`, `ticker-hedgeability`, `session-open-at-time`,
-`stamp-duty`, `clearing-house`, `sgx-closing-routine`, `calendar-event`, `access-channel`,
-`central-bank`, `index-construction`.
+**Quizzes in this group:**
+
+| Quiz | Generators |
+| --- | --- |
+| Microstructure | `session-open-at-time`, `stamp-duty`, `clearing-house`, `sgx-closing-routine` |
+| Tickers | `ticker-name`, `ticker-sector`, `ticker-cap-band`, `ticker-index-membership`, `ticker-liquidity`, `ticker-hedgeability` |
+| Market knowledge | `calendar-event`, `access-channel`, `central-bank`, `index-construction` |
 
 ## 2.1 Market microstructure
 
@@ -343,10 +355,13 @@ The derivatives layer for the region, in two halves: the **listed** contracts a 
 legs, and the **OTC exotics** sold on top of them. This is the core of the project; everything else
 serves it.
 
-**Generators in this group:** `contract-point-value`, `contract-notional`, `contract-expiry`,
-`contract-cross-listed` (subgroup `listed`); `exotic-identify`, `exotic-greeks`, `exotic-stickiness`,
-`exotic-hedgeability`, `exotic-convention`, `exotic-where-sold`, `forward-vol`, `vol-basis-pnl`
-(subgroup `exotic`); `vol-surface-recall` (subgroup `vol-surface`).
+**Quizzes in this group:**
+
+| Quiz | Generators |
+| --- | --- |
+| Listed derivatives | `contract-point-value`, `contract-notional`, `contract-expiry`, `contract-cross-listed` |
+| Exotic options | `exotic-identify`, `exotic-greeks`, `exotic-stickiness`, `exotic-hedgeability`, `exotic-convention`, `exotic-where-sold`, `forward-vol`, `vol-basis-pnl` |
+| Vol surface and skew | `vol-surface-recall` |
 
 ## 3.1 Listed derivatives
 

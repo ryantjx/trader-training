@@ -1,0 +1,73 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { FreeDrill } from '../../components/games/FreeDrill';
+import { ParityGame } from '../../components/games/ParityGame';
+import { generatorsForQuiz } from '../../lib/generators/registry';
+import { url } from '../../lib/url';
+import { CATEGORY_LABELS, GROUP_SLUGS, type Category, type Subgroup } from '../../lib/types';
+
+// Defined inline: Astro binds getStaticPaths to the page module. It is also
+// hoisted above the rest of the frontmatter, so it must not close over
+// module-scope constants — every value is repeated inside it.
+export function getStaticPaths() {
+  const quizzes: { subgroup: Subgroup; category: Category; label: string }[] = [
+    { subgroup: 'greeks', category: 'math', label: 'Greeks and PnL' },
+    { subgroup: 'put-call-parity', category: 'math', label: 'Put-call parity' },
+    { subgroup: 'basis-points', category: 'math', label: 'Basis points and money' },
+    { subgroup: 'fx', category: 'math', label: 'FX' },
+    { subgroup: 'forwards', category: 'math', label: 'Forwards' },
+    { subgroup: 'vol', category: 'math', label: 'Vol and strikes' },
+    { subgroup: 'microstructure', category: 'markets', label: 'Microstructure' },
+    { subgroup: 'tickers', category: 'markets', label: 'Tickers' },
+    { subgroup: 'market-knowledge', category: 'markets', label: 'Market knowledge' },
+    { subgroup: 'listed', category: 'derivatives', label: 'Listed derivatives' },
+    { subgroup: 'exotic', category: 'derivatives', label: 'Exotic options' },
+    { subgroup: 'vol-surface', category: 'derivatives', label: 'Vol surface and skew' },
+  ];
+  return quizzes.map((quiz) => ({ params: { quiz: quiz.subgroup }, props: { quiz } }));
+}
+
+const { quiz } = Astro.props as { quiz: { subgroup: Subgroup; category: Category; label: string } };
+
+const generators = generatorsForQuiz(quiz.subgroup);
+const groupHref = url(`group/${GROUP_SLUGS[quiz.category]}`);
+---
+
+<StarlightPage
+  frontmatter={{
+    title: quiz.label,
+    description: `Practise ${quiz.label}, in ${CATEGORY_LABELS[quiz.category]}.`,
+  }}
+>
+  <p class="tt-citation">
+    <a href={groupHref}>{CATEGORY_LABELS[quiz.category]}</a> › {quiz.label} ·{' '}
+    {generators.length} generator{generators.length === 1 ? '' : 's'}
+  </p>
+
+  {quiz.subgroup === 'put-call-parity' ? (
+    <p>
+      The competitive version: fifteen questions, one hidden leg each time, scored to the penny with
+      your personal best shown on the start screen. The timer pauses between questions and does not
+      affect your score.
+    </p>
+  ) : null}
+
+  {/* The quiz comes first: this is a quiz site. */}
+  {quiz.subgroup === 'put-call-parity' ? <ParityGame client:load /> : <FreeDrill client:load subgroup={quiz.subgroup} />}
+
+  <details style="margin-top: 2rem">
+    <summary style="cursor: pointer">What this quiz tests</summary>
+    <ul>
+      {generators.map((generator) => (
+        <li>
+          <span class="tt-mono">{generator.id}</span> — {generator.about}
+        </li>
+      ))}
+    </ul>
+  </details>
+
+  <p class="tt-citation" style="margin-top: 1.5rem">
+    Untimed and unlimited. Nothing here affects your daily record, but anything you miss still feeds
+    the spaced-repetition queue. For the set that mixes every group, play <a href={url('')}>Today</a>.
+  </p>
+</StarlightPage>

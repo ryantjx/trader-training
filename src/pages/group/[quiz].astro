@@ -1,0 +1,53 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { FreeDrill } from '../../components/games/FreeDrill';
+import { generatorsBySubgroup } from '../../lib/generators/registry';
+import { url } from '../../lib/url';
+import { CATEGORY_DESCRIPTIONS, type Category } from '../../lib/types';
+
+// Defined inline: Astro binds getStaticPaths to the page module, so a re-export
+// from a helper would break route generation. Astro also hoists this function
+// above the rest of the frontmatter, so it must not close over module-scope
+// constants — every value it needs is defined inside it.
+export function getStaticPaths() {
+  return [
+    { slug: '1-math', label: 'Math', category: 'math' },
+    { slug: '2-markets', label: 'Markets', category: 'markets' },
+    { slug: '3-asia-derivatives', label: 'Asia Derivatives', category: 'derivatives' },
+  ].map(({ slug, label, category }) => ({
+    params: { quiz: slug },
+    props: { category: category as Category, label },
+  }));
+}
+
+const { category, label } = Astro.props as { category: Category; label: string };
+
+// Each quiz inside the group, so this page doubles as the group's index.
+const quizzes = generatorsBySubgroup(category);
+---
+
+<StarlightPage
+  frontmatter={{ title: `${label} quizzes`, description: `The ${label} quizzes, and a mixed drill across all of them.` }}
+>
+  <p>{CATEGORY_DESCRIPTIONS[category]}</p>
+
+  <h2>Quizzes in this group</h2>
+  <ul>
+    {quizzes.map((quiz) => (
+      <li>
+        <a href={url(`quiz/${quiz.subgroup}`)}>{quiz.label}</a>
+        <span class="tt-citation"> — {quiz.generators.length} generator{quiz.generators.length === 1 ? '' : 's'}</span>
+      </li>
+    ))}
+  </ul>
+
+  <h2>Mixed drill</h2>
+  <p class="tt-citation">
+    Draws from every generator in the group rather than one quiz, untimed and unlimited.
+  </p>
+  <FreeDrill client:load category={category} />
+
+  <p class="tt-citation" style="margin-top: 1.5rem">
+    For the set that mixes all three groups, play <a href={url('')}>Today</a>.
+  </p>
+</StarlightPage>

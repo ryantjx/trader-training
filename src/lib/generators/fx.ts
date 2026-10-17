@@ -57,6 +57,7 @@ function usdConversion(rng: Rng, tier: Tier): NumericQuestion {
     id: `fx-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'fx-conversion',
     category: 'math',
+    subgroup: 'fx',
     tier,
     prompt: `Convert ${formatAmount(amount, spec.from)} to ${spec.to} at ${pair.pair} ${pair.rate.toFixed(pair.pipDecimals)}. Give the answer in ${spec.to}, to 2 decimal places.`,
     context: `${pair.pair} is quoted as ${spec.to} per 1 ${spec.from}. Multiply, do not divide.`,
@@ -91,6 +92,7 @@ function triangulation(rng: Rng, tier: Tier): NumericQuestion {
     id: `fx-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'fx-triangulation',
     category: 'math',
+    subgroup: 'fx',
     tier,
     prompt: `Given ${spec.a} ${pa.rate.toFixed(pa.pipDecimals)} and ${spec.b} ${pb.rate.toFixed(pb.pipDecimals)}, what is ${spec.cross}? Give 4 decimal places.`,
     context: 'Both quotes share the USD leg. The cross rate is the ratio of the two, and you must decide which way round.',
@@ -118,6 +120,7 @@ function pipValue(rng: Rng, tier: Tier): NumericQuestion {
     id: `fx-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'fx-pip-value',
     category: 'math',
+    subgroup: 'fx',
     tier,
     prompt: `You hold ${formatAmount(notional, pair.pair.split('/')[0] as string)} of ${pair.pair}. What is the value of one pip, in ${quote}?`,
     context: `${pair.pair} is quoted to ${pair.pipDecimals} decimal places, so one pip is ${pipSize}.`,
@@ -148,6 +151,7 @@ function recallLevel(rng: Rng, tier: Tier): NumericQuestion {
     id: `fx-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'fx-recall-level',
     category: 'math',
+    subgroup: 'fx',
     tier,
     prompt: `What is ${pair.pair} currently trading at? Give ${pair.pipDecimals} decimal places.`,
     context: `Data snapshot: ${fxData.asOf}.`,
@@ -166,6 +170,7 @@ export const fxGenerators: Generator[] = [
   {
     id: 'fx-conversion',
     category: 'math',
+    subgroup: 'fx',
     tier: 1,
     about: 'Convert an amount between currencies at a supplied rate.',
     generate: usdConversion,
@@ -173,6 +178,7 @@ export const fxGenerators: Generator[] = [
   {
     id: 'fx-triangulation',
     category: 'math',
+    subgroup: 'fx',
     tier: 3,
     about: 'Derive a cross rate from two USD legs.',
     generate: triangulation,
@@ -180,6 +186,7 @@ export const fxGenerators: Generator[] = [
   {
     id: 'fx-pip-value',
     category: 'math',
+    subgroup: 'fx',
     tier: 2,
     about: 'Value of one pip on a given notional, in the quote currency.',
     generate: pipValue,
@@ -187,6 +194,7 @@ export const fxGenerators: Generator[] = [
   {
     id: 'fx-recall-level',
     category: 'math',
+    subgroup: 'fx',
     tier: 2,
     about: 'Recall the current level of a pair. Disabled until fx.json is verified.',
     generate: recallLevel,

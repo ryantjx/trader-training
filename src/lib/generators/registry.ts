@@ -23,6 +23,7 @@ import { volSurfaceGenerators } from './vol-surface';
 import { marketKnowledgeGenerators } from './knowledge';
 import {
   CATEGORIES,
+  QUIZZES,
   SUBGROUP_LABELS,
   type Category,
   type Generator,
@@ -78,33 +79,36 @@ export function generatorsForCategory(category: Category): RegisteredGenerator[]
 }
 
 /**
- * The generators of a category grouped by subgroup, with an ungrouped bucket for
- * anything that declares none. Used by the drill page so that the merged
- * derivatives group still shows listed contracts, exotic payoffs and vol surface
- * as separate topics.
+ * The generators of one quiz (subgroup). This is what a quiz page renders.
+ */
+export function generatorsForQuiz(subgroup: Subgroup): RegisteredGenerator[] {
+  return GENERATORS.filter((g) => g.subgroup === subgroup);
+}
+
+/**
+ * Quizzes that actually have generators, in sidebar order.
+ */
+export function populatedQuizzes(): { subgroup: Subgroup; category: Category; label: string }[] {
+  return QUIZZES.filter((q) =>
+    GENERATORS.some((g) => g.subgroup === q.subgroup && g.available),
+  );
+}
+
+/**
+ * The generators of a category grouped by quiz, in the order of QUIZZES. Used by
+ * the group overview page so it lists its quizzes in a stable order.
  */
 export function generatorsBySubgroup(
   category: Category,
-): { subgroup: Subgroup | null; label: string; generators: RegisteredGenerator[] }[] {
+): { subgroup: Subgroup; label: string; generators: RegisteredGenerator[] }[] {
   const inCategory = generatorsForCategory(category);
-  const buckets = new Map<Subgroup | null, RegisteredGenerator[]>();
-
-  for (const generator of inCategory) {
-    const key = generator.subgroup ?? null;
-    const bucket = buckets.get(key) ?? [];
-    bucket.push(generator);
-    buckets.set(key, bucket);
-  }
-
-  // Ordered: ungrouped first, then the declared subgroups in a stable order.
-  const order: (Subgroup | null)[] = [null, 'listed', 'exotic', 'vol-surface'];
-  return order
-    .filter((key) => buckets.has(key))
-    .map((key) => ({
-      subgroup: key,
-      label: key === null ? 'General' : SUBGROUP_LABELS[key],
-      generators: buckets.get(key) ?? [],
-    }));
+  return QUIZZES.filter((q) => q.category === category)
+    .map((q) => ({
+      subgroup: q.subgroup,
+      label: q.label,
+      generators: inCategory.filter((g) => g.subgroup === q.subgroup),
+    }))
+    .filter((bucket) => bucket.generators.length > 0);
 }
 
 /**

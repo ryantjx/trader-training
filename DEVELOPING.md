@@ -73,7 +73,35 @@ export const someGenerators: Generator[] = [
 Add a generator by writing the function, adding it to the list in its file, and spreading that list
 in `registry.ts`. Nothing else needs to change.
 
-#### The three groups
+### Routes
+
+Every quiz is its own page. The route structure mirrors the sidebar exactly:
+
+```
+/                        Today — the daily set, 20 questions from all three groups
+/group/1-math            Math overview: its quizzes, plus a mixed drill
+/group/2-markets         Markets overview
+/group/3-asia-derivatives  Asia Derivatives overview
+/quiz/greeks             one quiz
+/quiz/put-call-parity    ...  (12 quiz pages in total)
+/quiz/fx /quiz/forwards /quiz/vol /quiz/basis-points
+/quiz/microstructure /quiz/tickers /quiz/market-knowledge
+/quiz/listed /quiz/exotic /quiz/vol-surface
+/reference/{sgx,hkex,jpx,krx,asx}   market-structure content
+/stats /about
+```
+
+The numbered group slugs come from `GROUP_SLUGS` in `types.ts`, and the quiz list from
+`QUIZZES` in the same file — which is the single source of truth for the sidebar, the routes and
+the index on the homepage. Adding a quiz means adding a `Subgroup`, a `SUBGROUP_LABELS` entry, a
+`QUIZZES` row, a sidebar entry in `astro.config.mjs`, and a `getStaticPaths` row in
+`src/pages/quiz/[quiz].astro`.
+
+**Build internal links with `url()` from `src/lib/url.ts`, never string concatenation.**
+`import.meta.env.BASE_URL` has no trailing slash, so `${base}quiz/fx` yields
+`/trader-trainingquiz/fx` — a 404 where the page still renders, which reads as a styling bug.
+
+### The three groups
 
 Every generator declares exactly one of three categories. The grouping is the same in the README, the
 sidebar and the code:
@@ -94,6 +122,10 @@ This replaced an earlier five-way split in which `derivatives` and `exotics` wer
 - **The old `knowledge` category was genuinely mixed.** Calendars and access are market content;
   the volatility surface is derivatives content. It was split into `knowledge.ts` and
   `vol-surface.ts` rather than relabelled.
+- **Every generator also declares a `subgroup`**, which is the quiz it belongs to. The subgroup is
+  what the sidebar, the routes and the quiz pages key off, so a generator without one would have no
+  page and would silently vanish. A test asserts every generator has a subgroup that appears in
+  `QUIZZES`.
 
 Every question carries four fields beyond the answer, and they are what make this a trainer rather
 than a quiz:
@@ -165,11 +197,11 @@ To reproduce what Pages does locally:
 npm run build
 mkdir -p /tmp/tt/trader-training && cp -r dist/* /tmp/tt/trader-training/
 cd /tmp/tt && python3 -m http.server 4477
-# then open http://localhost:4477/trader-training/drill/math
+# then open http://localhost:4477/trader-training/quiz/fx
 ```
 
 Serving under the subpath matters because it is the only way to catch a link that bypasses `base`.
-Astro rewrites its own routed links, but a literal `href="/drill/math"` in an `.astro` file or a
+Astro rewrites its own routed links, but a literal `href="/quiz/fx"` in an `.astro` file or a
 component will break under the prefix. Use `import.meta.env.BASE_URL` for those.
 
 ## Known gaps

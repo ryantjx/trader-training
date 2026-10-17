@@ -220,6 +220,7 @@ export function generateParity(rng: Rng, tier: Tier): NumericQuestion {
     id: `parity-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'put-call-parity',
     category: 'math',
+    subgroup: 'put-call-parity',
     tier,
     prompt: `Find the missing value. Call = (Stock − Strike) + Put + Rev/Con.\n\n${renderParityPrompt(d, hidden)}`,
     context:
@@ -267,6 +268,7 @@ export function generateParityChoice(rng: Rng, tier: Tier): import('../types').C
     id: `parity-choice-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'put-call-parity-structure',
     category: 'math',
+    subgroup: 'put-call-parity',
     tier,
     prompt: `Which expression solves for the ${LABELS[hidden].toLowerCase()}?`,
     context: `Call = (Stock − Strike) + Put + Rev/Con. Stock ${money(d.stockCents)}, Strike ${money(d.strikeCents)}, Call ${money(d.callCents)}, Put ${money(d.putCents)}, Rev/Con ${money(d.revConCents)}.`,
@@ -283,6 +285,7 @@ export const parityGenerators: Generator[] = [
   {
     id: 'put-call-parity',
     category: 'math',
+    subgroup: 'put-call-parity',
     tier: 1,
     about: 'Find the missing leg of put-call parity, correct to the penny.',
     generate: generateParity,
@@ -290,6 +293,7 @@ export const parityGenerators: Generator[] = [
   {
     id: 'put-call-parity-structure',
     category: 'math',
+    subgroup: 'put-call-parity',
     tier: 2,
     about: 'Pick the correct rearrangement of parity for a given missing leg.',
     generate: generateParityChoice,

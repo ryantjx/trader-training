@@ -1,6 +1,7 @@
 ---
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import sessionsData from '../../data/sessions.json';
+import { url } from '../../lib/url';
 
 interface Venue {
   id: string;
@@ -59,8 +60,7 @@ const { venue, title, dstCaveat } = Astro.props as {
 
 const sessions = venue.continuousSgt.map((s) => `${s.open}–${s.close}`).join(' and ');
 const lunch = venue.lunchSgt.map((s) => `${s.open}–${s.close}`).join(', ');
-const base = import.meta.env.BASE_URL;
-const marketsQuiz = `${base}drill/markets`;
+const marketsQuiz = url('group/2-markets');
 ---
 
 <StarlightPage

@@ -53,6 +53,7 @@ function bpToMoney(rng: Rng, tier: Tier): NumericQuestion {
     id: `bp-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'bp-to-money',
     category: 'math',
+    subgroup: 'basis-points',
     tier,
     prompt: `What is ${bps} basis point${bps === 1 ? '' : 's'} of ${formatNotional(notional, currency.code)}, in ${currency.code}?`,
     context: 'A basis point of notional is a cost or a fee, not a price move.',
@@ -79,6 +80,7 @@ function moneyToBp(rng: Rng, tier: Tier): NumericQuestion {
     id: `bp-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'money-to-bp',
     category: 'math',
+    subgroup: 'basis-points',
     tier,
     prompt: `You made ${money.toLocaleString('en-US')} ${currency.code} on ${formatNotional(notional, currency.code)} of notional. How many basis points is that?`,
     context: 'Express the PnL as a fraction of notional, then multiply by 10,000.',
@@ -114,6 +116,7 @@ function indexMoveToMoney(rng: Rng, tier: Tier): NumericQuestion {
     id: `bp-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'index-bps-to-money',
     category: 'math',
+    subgroup: 'basis-points',
     tier,
     prompt: `The ${contract.name} is at ${contract.level.toLocaleString('en-US')} with a multiplier of ${contract.perPoint.toLocaleString('en-US')} ${contract.currency} per index point. You hold ${lots} lot${lots > 1 ? 's' : ''}. What is the PnL from a ${bps}bp move in the index, in ${contract.currency}?`,
     context: 'Here the basis point is of PRICE, not of notional. Convert to index points first, then to money.',
@@ -132,6 +135,7 @@ export const bpGenerators: Generator[] = [
   {
     id: 'bp-to-money',
     category: 'math',
+    subgroup: 'basis-points',
     tier: 1,
     about: 'Basis points of notional to money, across the regional currencies.',
     generate: bpToMoney,
@@ -139,6 +143,7 @@ export const bpGenerators: Generator[] = [
   {
     id: 'money-to-bp',
     category: 'math',
+    subgroup: 'basis-points',
     tier: 2,
     about: 'Money back to basis points of notional.',
     generate: moneyToBp,
@@ -146,6 +151,7 @@ export const bpGenerators: Generator[] = [
   {
     id: 'index-bps-to-money',
     category: 'math',
+    subgroup: 'basis-points',
     tier: 3,
     about: 'A basis-point move in an index level, converted to money through the point value.',
     generate: indexMoveToMoney,

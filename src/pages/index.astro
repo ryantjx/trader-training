@@ -2,11 +2,21 @@
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { DailyChallenge } from '../components/games/DailyChallenge';
 import { quizDateKey } from '../lib/seed';
+import { populatedQuizzes } from '../lib/generators/registry';
+import { url } from '../lib/url';
+import { CATEGORY_LABELS, GROUP_SLUGS } from '../lib/types';
 
 const dateKey = quizDateKey();
+// Grouped so the index mirrors the sidebar.
+const groups = (['math', 'markets', 'derivatives'] as const).map((category) => ({
+  category,
+  label: CATEGORY_LABELS[category],
+  href: url(`group/${GROUP_SLUGS[category]}`),
+  quizzes: populatedQuizzes().filter((q) => q.category === category),
+}));
 ---
 
-<StarlightPage frontmatter={{ title: 'Today', description: 'The daily set: 20 mixed questions.' }}>
+<StarlightPage frontmatter={{ title: 'Today', description: 'The daily set, and every quiz.' }}>
   <p>
     Twenty questions drawn from all three groups — <strong>Math</strong>, <strong>Markets</strong> and
     <strong>Asia Derivatives</strong> — interleaved rather than blocked, because that is what a trading
@@ -20,9 +30,28 @@ const dateKey = quizDateKey();
 
   <DailyChallenge client:load mode="drill" />
 
+  <h2>Every quiz</h2>
+  <p class="tt-citation">
+    The daily set above mixes all of them. To drill a single quiz, pick one below or use the sidebar.
+  </p>
+  {groups.map((group) => (
+    <div>
+      <h3 style="margin-bottom: 0.25rem">
+        <a href={group.href}>{group.label}</a>
+      </h3>
+      <ul>
+        {group.quizzes.map((quiz) => (
+          <li>
+            <a href={url(`quiz/${quiz.subgroup}`)}>{quiz.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+
   <p class="tt-citation">
     No account is needed and nothing is sent anywhere. Progress, personal bests and the
-    spaced-repetition queue are stored in this browser only. To work on a single group instead, use
-    the quizzes in the sidebar; see the About page to back up your progress.
+    spaced-repetition queue are stored in this browser only. See the About page to back up your
+    progress.
   </p>
 </StarlightPage>

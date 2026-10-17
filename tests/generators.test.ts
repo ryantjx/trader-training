@@ -4,7 +4,7 @@ import { GENERATORS, availableGenerators } from '../src/lib/generators/registry'
 import { isMarkStable, mark } from '../src/lib/marking';
 import { drawLegal, isLegal } from '../src/lib/generators/parity';
 import { mulberry32 } from '../src/lib/rng';
-import { CATEGORIES } from '../src/lib/types';
+import { CATEGORIES, QUIZZES } from '../src/lib/types';
 import { INDICES } from '../src/lib/generators/indices';
 import type { NumericQuestion, Question } from '../src/lib/types';
 
@@ -90,13 +90,44 @@ describe('generators', () => {
   });
 
   // The merge of listed contracts and OTC exotics into one group is only safe
-  // because the subgroup survives, so that the drill page can still tell them
+  // because the subgroup survives, so that the quiz pages can still tell them
   // apart. Check the derivatives group actually carries both.
   it('keeps the listed and exotic subgroups apart inside the derivatives group', () => {
     const derivatives = GENERATORS.filter((g) => g.category === 'derivatives');
     const subgroups = new Set(derivatives.map((g) => g.subgroup));
     expect(subgroups, 'no listed generators survived the merge').toContain('listed');
     expect(subgroups, 'no exotic generators survived the merge').toContain('exotic');
+  });
+
+  // Every quiz is its own page, so a generator with no subgroup would have no
+  // route and would silently vanish from the site.
+  it('gives every generator a subgroup, so every question has a page', () => {
+    for (const generator of GENERATORS) {
+      expect(generator.subgroup, `${generator.id} has no subgroup`).toBeDefined();
+      expect(QUIZZES.map((q) => q.subgroup)).toContain(generator.subgroup);
+    }
+  });
+
+  // Each quiz in the sidebar must actually have questions behind it.
+  it('has every declared quiz populated', () => {
+    for (const quiz of QUIZZES) {
+      const inQuiz = GENERATORS.filter((g) => g.subgroup === quiz.subgroup && g.available);
+      expect(inQuiz.length, `quiz ${quiz.subgroup} has no generators`).toBeGreaterThan(0);
+    }
+  });
+
+  // A quiz's generators must belong to the group the quiz is filed under, or the
+  // sidebar and the page would disagree about where it lives.
+  it('files each quiz under the group its generators use', () => {
+    for (const quiz of QUIZZES) {
+      const generators = GENERATORS.filter((g) => g.subgroup === quiz.subgroup);
+      for (const generator of generators) {
+        expect(
+          generator.category,
+          `${quiz.subgroup} is filed under ${quiz.category} but a generator uses ${generator.category}`,
+        ).toBe(quiz.category);
+      }
+    }
   });
 
   it('gives every generator a unique id', () => {

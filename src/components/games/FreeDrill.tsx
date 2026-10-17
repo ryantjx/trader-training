@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { generatorsForCategory } from '../../lib/generators/registry';
+import { generatorsForCategory, generatorsForQuiz } from '../../lib/generators/registry';
 import { freeRng } from '../../lib/seed';
 import { mark } from '../../lib/marking';
 import { createLocalStore } from '../../lib/storage';
 import { review } from '../../lib/srs';
-import type { Category, Question, Response, Tier } from '../../lib/types';
+import type { Category, Question, Response, Subgroup, Tier } from '../../lib/types';
 import { QuestionCard } from './QuestionCard';
 import { FeedbackPanel } from './FeedbackPanel';
 
 export interface FreeDrillProps {
-  category: Category;
+  /** Practise one whole group, or one quiz inside it. Give exactly one. */
+  category?: Category;
+  subgroup?: Subgroup;
   tier?: Tier;
 }
 
@@ -25,8 +27,14 @@ export interface FreeDrillProps {
  * The seed advances on every question, so questions do not repeat within a
  * session.
  */
-export function FreeDrill({ category, tier = 2 }: FreeDrillProps) {
-  const pool = useMemo(() => generatorsForCategory(category).filter((g) => g.available), [category]);
+export function FreeDrill({ category, subgroup, tier = 2 }: FreeDrillProps) {
+  const pool = useMemo(
+    () =>
+      (subgroup ? generatorsForQuiz(subgroup) : generatorsForCategory(category as Category)).filter(
+        (g) => g.available,
+      ),
+    [category, subgroup],
+  );
   const [counter, setCounter] = useState(0);
   const [response, setResponse] = useState<Response>({ kind: 'numeric', value: null });
   const [result, setResult] = useState<ReturnType<typeof mark> | null>(null);
@@ -35,10 +43,10 @@ export function FreeDrill({ category, tier = 2 }: FreeDrillProps) {
   // A fresh question each time the counter advances.
   const question = useMemo<Question | null>(() => {
     if (pool.length === 0) return null;
-    const rng = freeRng(`${category}:${counter}`);
+    const rng = freeRng(`${subgroup ?? category}:${counter}`);
     const generator = pool[rng.int(0, pool.length - 1)] as (typeof pool)[number];
     return generator.generate(rng, tier);
-  }, [pool, category, counter, tier]);
+  }, [pool, subgroup, category, counter, tier]);
 
   useEffect(() => {
     if (!question) return;
@@ -61,7 +69,7 @@ export function FreeDrill({ category, tier = 2 }: FreeDrillProps) {
   }, [question, response, result]);
 
   if (pool.length === 0) {
-    return <p>No generators are available for this category yet.</p>;
+    return <p>No generators are available for this quiz yet.</p>;
   }
 
   if (!question) return null;

@@ -55,6 +55,7 @@ function forwardRate(rng: Rng, tier: Tier): NumericQuestion {
     id: `fwd-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'forward-rate',
     category: 'math',
+    subgroup: 'forwards',
     tier,
     prompt: `${spec.pair} spot is ${spec.spot.toFixed(spec.decimals)}. The ${quote} ${tenor.label} rate is ${rQuote}% and the ${base} ${tenor.label} rate is ${rBase}%. What is the ${tenor.label} forward, to ${spec.decimals} decimal places?`,
     context: `F = S x (1 + r_${quote} t) / (1 + r_${base} t), with t = ${tenor.years.toFixed(4)} years.`,
@@ -92,6 +93,7 @@ function premiumOrDiscount(rng: Rng, tier: Tier): ChoiceQuestion {
     id: `fwd-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'forward-premium',
     category: 'math',
+    subgroup: 'forwards',
     tier,
     prompt: `${spec.pair} spot is ${spec.spot.toFixed(spec.decimals)}. The ${quote} rate is ${rQuote}% and the ${base} rate is ${rBase}%. Which leg trades at a forward discount?`,
     context: `${spec.pair} means ${quote} per 1 ${base}. The ${quote} leg is the quote currency and the ${base} leg is the base currency.`,
@@ -123,6 +125,7 @@ function rollCost(rng: Rng, tier: Tier): NumericQuestion {
     id: `fwd-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'forward-roll-cost',
     category: 'math',
+    subgroup: 'forwards',
     tier,
     prompt: `${spec.pair} spot is ${spec.spot.toFixed(spec.decimals)} and the ${tenor.label} forward points are ${pointsPerBase >= 0 ? '+' : ''}${roundTo(pointsPerBase * 10 ** spec.decimals, 1)} pips. You need to roll a ${notional.toLocaleString('en-US')} ${spec.pair.split('/')[0] as string} hedge one ${tenor.label} forward. What does the roll cost, in ${spec.pair.split('/')[1] as string}, to 2 decimal places? Ignore bid-ask.`,
     context: 'Cost = absolute forward points x notional. The sign tells you which side pays; the magnitude is what you budget.',
@@ -141,6 +144,7 @@ export const forwardGenerators: Generator[] = [
   {
     id: 'forward-rate',
     category: 'math',
+    subgroup: 'forwards',
     tier: 3,
     about: 'Derive an FX forward rate from spot and an interest-rate differential.',
     generate: forwardRate,
@@ -148,6 +152,7 @@ export const forwardGenerators: Generator[] = [
   {
     id: 'forward-premium',
     category: 'math',
+    subgroup: 'forwards',
     tier: 2,
     about: 'Which leg of an FX pair trades at a forward premium or discount.',
     generate: premiumOrDiscount,
@@ -155,6 +160,7 @@ export const forwardGenerators: Generator[] = [
   {
     id: 'forward-roll-cost',
     category: 'math',
+    subgroup: 'forwards',
     tier: 4,
     about: 'Cost in money of rolling a hedge forward by one tenor.',
     generate: rollCost,

@@ -74,6 +74,7 @@ function openAtTime(rng: Rng, tier: Tier): ChoiceQuestion {
     id: `micro-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'session-open-at-time',
     category: 'markets',
+    subgroup: 'microstructure',
     tier,
     prompt: `At ${time} SGT, is ${target.name} in continuous trading?`,
     context: `${target.name} continuous session is ${sessionText} SGT${lunchText ? `, with a lunch break ${lunchText}` : ''}.`,
@@ -121,6 +122,7 @@ function stampDuty(rng: Rng, tier: Tier): ChoiceQuestion {
     id: `micro-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'stamp-duty',
     category: 'markets',
+    subgroup: 'microstructure',
     tier,
     prompt: `What is the stamp-duty position on an exchange trade in ${target.name}?`,
     context: 'Stamp duty is a per-side transaction levy on stock trades, and it is the single largest cost difference between these markets.',
@@ -154,6 +156,7 @@ function closingRoutine(rng: Rng, tier: Tier): OrderingQuestion {
     id: `micro-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'sgx-closing-routine',
     category: 'markets',
+    subgroup: 'microstructure',
     tier,
     prompt: 'Put the phases of the SGX closing routine in order.',
     context: 'SGX closes later than HKEX and JPX, so this window is often the only one still open in the region.',
@@ -171,6 +174,7 @@ export const microstructureGenerators: Generator[] = [
   {
     id: 'session-open-at-time',
     category: 'markets',
+    subgroup: 'microstructure',
     tier: 1,
     about: 'Is a market open at a given SGT time?',
     generate: openAtTime,
@@ -178,6 +182,7 @@ export const microstructureGenerators: Generator[] = [
   {
     id: 'stamp-duty',
     category: 'markets',
+    subgroup: 'microstructure',
     tier: 2,
     about: 'The stamp-duty position per market.',
     generate: stampDuty,
@@ -185,6 +190,7 @@ export const microstructureGenerators: Generator[] = [
   {
     id: 'clearing-house',
     category: 'markets',
+    subgroup: 'microstructure',
     tier: 2,
     about: 'Which body clears each market.',
     generate: clearingHouse,
@@ -192,6 +198,7 @@ export const microstructureGenerators: Generator[] = [
   {
     id: 'sgx-closing-routine',
     category: 'markets',
+    subgroup: 'microstructure',
     tier: 3,
     about: 'Sequence the phases of the SGX closing routine.',
     generate: closingRoutine,

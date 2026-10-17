@@ -84,6 +84,7 @@ function vegaPnl(rng: Rng, tier: Tier): NumericQuestion {
     id: `vega-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'vega-pnl',
     category: 'math',
+    subgroup: 'vol',
     tier,
     prompt: `Your vega is ${vega.toLocaleString('en-US')} per vol point. Implied vol rises ${volMove} points. What is the vega PnL, in dollars?`,
     context: 'Vega is quoted per vol point, meaning per 1% absolute change in vol, not per 1% of vol.',
@@ -108,6 +109,7 @@ function priceMoveToVolPoints(rng: Rng, tier: Tier): NumericQuestion {
     id: `vol-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'price-move-to-vol',
     category: 'math',
+    subgroup: 'vol',
     tier,
     prompt: `The index moves ${move}% in a day and annualised implied vol is ${vol}%. Express that move in vol points, to 4 decimal places.`,
     context: 'A move of x% at k% annualised vol is worth approximately x / k vol points.',
@@ -138,6 +140,7 @@ function deltaStrike(rng: Rng, tier: Tier): NumericQuestion {
     id: `delta-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'delta-strike',
     category: 'math',
+    subgroup: 'vol',
     tier,
     prompt: `The ${index.name} is at ${spot.toLocaleString('en-US')}, ${tenor.label} implied vol is ${vol}%. Where is the ${Math.round(delta * 100)}-delta ${isPut ? 'put' : 'call'} strike, to 1 decimal place?`,
     context: `K ≈ S x exp(±z σ√T) with z = Φ⁻¹(${delta}). Round numbers: Φ⁻¹(0.25) ≈ 0.67, Φ⁻¹(0.10) ≈ 1.28.`,
@@ -164,6 +167,7 @@ function breakevenVol(rng: Rng, tier: Tier): NumericQuestion {
     id: `be-${rng.int(0, 1_000_000).toString(36)}`,
     generatorId: 'breakeven-vol',
     category: 'math',
+    subgroup: 'vol',
     tier,
     prompt: `Your book has gamma ${gamma.toLocaleString('en-US')} and theta ${theta.toLocaleString('en-US')} per day, both in dollars per 1 percentage point. What annualised realised vol do you need to break even, in vol points to 2 decimal places? Assume 252 trading days.`,
     context: 'σ_be = sqrt(2 Θ / Γ) per unit time. Convert the daily figure to annualised by multiplying by sqrt(252).',
@@ -239,6 +243,7 @@ export const vegaGenerators: Generator[] = [
   {
     id: 'vega-pnl',
     category: 'math',
+    subgroup: 'vol',
     tier: 1,
     about: 'Vega PnL from vega quoted per vol point.',
     generate: vegaPnl,
@@ -246,6 +251,7 @@ export const vegaGenerators: Generator[] = [
   {
     id: 'price-move-to-vol',
     category: 'math',
+    subgroup: 'vol',
     tier: 2,
     about: 'Express a percentage price move in vol points.',
     generate: priceMoveToVolPoints,
@@ -253,6 +259,7 @@ export const vegaGenerators: Generator[] = [
   {
     id: 'delta-strike',
     category: 'math',
+    subgroup: 'vol',
     tier: 3,
     about: 'Approximate the strike for a given delta.',
     generate: deltaStrike,
@@ -260,6 +267,7 @@ export const vegaGenerators: Generator[] = [
   {
     id: 'breakeven-vol',
     category: 'math',
+    subgroup: 'vol',
     tier: 4,
     about: 'Annualised breakeven vol from gamma and theta.',
     generate: breakevenVol,

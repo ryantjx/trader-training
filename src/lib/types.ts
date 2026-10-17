@@ -53,19 +53,85 @@ export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
 };
 
 /**
- * Optional sub-grouping within a group.
+ * The quiz a generator belongs to, within its group.
  *
- * Only `derivatives` uses this, to keep listed and exotic content apart in the
- * UI now that they share a group. Undefined means the generator has no
- * sub-classification.
+ * Each group is split into individual quizzes, and each quiz is its own page.
+ * This is the unit a trader actually practises, so it is the unit the sidebar
+ * lists and the unit a URL points at.
+ *
+ * `vol-surface` is the only cross-group value: the vol-surface generator sits in
+ * the derivatives group alongside the exotic payoffs.
  */
-export type Subgroup = 'listed' | 'exotic' | 'vol-surface';
+export type Subgroup =
+  // Math
+  | 'greeks'
+  | 'put-call-parity'
+  | 'basis-points'
+  | 'fx'
+  | 'forwards'
+  | 'vol'
+  // Markets
+  | 'microstructure'
+  | 'tickers'
+  | 'market-knowledge'
+  // Asia Derivatives
+  | 'listed'
+  | 'exotic'
+  | 'vol-surface';
 
 export const SUBGROUP_LABELS: Record<Subgroup, string> = {
+  greeks: 'Greeks and PnL',
+  'put-call-parity': 'Put-call parity',
+  'basis-points': 'Basis points and money',
+  fx: 'FX',
+  forwards: 'Forwards',
+  vol: 'Vol and strikes',
+  microstructure: 'Microstructure',
+  tickers: 'Tickers',
+  'market-knowledge': 'Market knowledge',
   listed: 'Listed derivatives',
   exotic: 'Exotic options',
-  'vol-surface': 'Volatility surface',
+  'vol-surface': 'Vol surface and skew',
 };
+
+/**
+ * Quizzes, in sidebar order, with the group each belongs to.
+ *
+ * Single source of truth: this drives the routes, the sidebar and the quiz
+ * pages. Adding a quiz means adding a subgroup above and a row here.
+ */
+export const QUIZZES: readonly { subgroup: Subgroup; category: Category; label: string }[] = [
+  { subgroup: 'greeks', category: 'math', label: 'Greeks and PnL' },
+  { subgroup: 'put-call-parity', category: 'math', label: 'Put-call parity' },
+  { subgroup: 'basis-points', category: 'math', label: 'Basis points and money' },
+  { subgroup: 'fx', category: 'math', label: 'FX' },
+  { subgroup: 'forwards', category: 'math', label: 'Forwards' },
+  { subgroup: 'vol', category: 'math', label: 'Vol and strikes' },
+  { subgroup: 'microstructure', category: 'markets', label: 'Microstructure' },
+  { subgroup: 'tickers', category: 'markets', label: 'Tickers' },
+  { subgroup: 'market-knowledge', category: 'markets', label: 'Market knowledge' },
+  { subgroup: 'listed', category: 'derivatives', label: 'Listed derivatives' },
+  { subgroup: 'exotic', category: 'derivatives', label: 'Exotic options' },
+  { subgroup: 'vol-surface', category: 'derivatives', label: 'Vol surface and skew' },
+] as const;
+
+export function quizBySlug(slug: string) {
+  return QUIZZES.find((q) => q.subgroup === slug);
+}
+
+export function quizzesForCategory(category: Category) {
+  return QUIZZES.filter((q) => q.category === category);
+}
+
+/**
+ * URL slugs for the three group pages. Numbered to match the sidebar.
+ */
+export const GROUP_SLUGS: Record<Category, string> = {
+  math: '1-math',
+  markets: '2-markets',
+  derivatives: '3-asia-derivatives',
+};
+
 
 /** Graduate, junior, VP, MD. Higher tiers get harder generators and less time. */
 export type Tier = 1 | 2 | 3 | 4;
