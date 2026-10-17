@@ -1,0 +1,75 @@
+/* Trader Training — minimal overrides on top of Starlight defaults.
+   Keep this small: the site's readability matters more than its styling. */
+
+:root {
+  --tt-correct: #1a7f4b;
+  --tt-wrong: #b4243a;
+  --tt-flag: #b07d00;
+  --tt-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* Numeric answers must align in columns and not shift as digits are typed. */
+.tt-numeric input {
+  font-family: var(--tt-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.tt-prompt {
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* The card that holds a question. Wide enough for a table, tight enough to read. */
+.tt-card {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  margin-block: 1rem;
+  background: var(--sl-color-bg-nav);
+}
+
+.tt-feedback-correct {
+  border-left: 3px solid var(--tt-correct);
+  padding-left: 0.75rem;
+}
+
+.tt-feedback-wrong {
+  border-left: 3px solid var(--tt-wrong);
+  padding-left: 0.75rem;
+}
+
+.tt-anchor {
+  font-size: 0.9rem;
+  color: var(--sl-color-gray-3);
+  font-style: italic;
+}
+
+.tt-citation {
+  font-size: 0.8rem;
+  color: var(--sl-color-gray-4);
+}
+
+.tt-mono {
+  font-family: var(--tt-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tt-timer {
+  font-family: var(--tt-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tt-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.tt-stale {
+  border-left: 3px solid var(--tt-flag);
+  padding-left: 0.75rem;
+  font-size: 0.9rem;
+}

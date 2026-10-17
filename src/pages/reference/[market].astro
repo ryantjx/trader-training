@@ -1,0 +1,163 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import sessionsData from '../../data/sessions.json';
+
+interface Venue {
+  id: string;
+  name: string;
+  market: string;
+  dstNote: string | null;
+  continuousSgt: { open: string; close: string }[];
+  lunchSgt: { open: string; close: string }[];
+  auctionsSgt: { name: string; time: string }[];
+  nonCancelSgt: string[];
+  marketCloseSgt: string;
+  settlement: string;
+  clearingHouse: string;
+  depository: string;
+  scripless: boolean;
+  stampDuty: string;
+  preOpenSgt: { start: string; end: string; randomEnd: string | null; note: string } | null;
+  tradeAtCloseSgt: string | null;
+}
+
+const TITLES: Record<string, string> = {
+  sgx: 'SGX',
+  hkex: 'HKEX',
+  jpx: 'JPX',
+  krx: 'KRX',
+  asx: 'ASX',
+};
+
+// Defined inline: Astro binds getStaticPaths to the page module, so a re-export
+// from a helper module would break route generation. Note also that Astro hoists
+// this function above the rest of the frontmatter, so it must not close over any
+// module-scope constant — every value it needs is defined inside it.
+export function getStaticPaths() {
+  const titles: Record<string, string> = {
+    sgx: 'SGX',
+    hkex: 'HKEX',
+    jpx: 'JPX',
+    krx: 'KRX',
+    asx: 'ASX',
+  };
+  return (sessionsData.venues as Venue[]).map((venue) => ({
+    params: { market: venue.id },
+    props: {
+      venue,
+      title: titles[venue.id] ?? venue.name,
+      dstCaveat: venue.dstNote && venue.dstNote.includes('UNVERIFIED') ? venue.dstNote : null,
+    },
+  }));
+}
+
+const { venue, title, dstCaveat } = Astro.props as {
+  venue: Venue;
+  title: string;
+  dstCaveat: string | null;
+};
+
+const sessions = venue.continuousSgt.map((s) => `${s.open}–${s.close}`).join(' and ');
+const lunch = venue.lunchSgt.map((s) => `${s.open}–${s.close}`).join(', ');
+const base = import.meta.env.BASE_URL;
+const marketsQuiz = `${base}drill/markets`;
+---
+
+<StarlightPage
+  frontmatter={{
+    title: `${title} market structure`,
+    description: `One-page market-structure summary for ${title}.`,
+  }}
+>
+  <p class="tt-citation">
+    Reference content, not a quiz. This page supports the <a href={marketsQuiz}>Markets quiz</a>,
+    where microstructure is tested.
+  </p>
+
+  {dstCaveat ? (
+    <p class="tt-stale">
+      <strong>Unverified.</strong> {dstCaveat}
+    </p>
+  ) : null}
+
+  <table>
+    <tbody>
+      <tr><th style="text-align: left; padding-right: 1.5rem">Venue</th><td>{venue.name} ({venue.market})</td></tr>
+      <tr><th style="text-align: left; padding-right: 1.5rem">Trading hours (SGT)</th><td class="tt-mono">{sessions}</td></tr>
+      {lunch ? <tr><th style="text-align: left; padding-right: 1.5rem">Lunch break</th><td class="tt-mono">{lunch}</td></tr> : null}
+      <tr><th style="text-align: left; padding-right: 1.5rem">Market close</th><td class="tt-mono">{venue.marketCloseSgt} SGT</td></tr>
+      <tr><th style="text-align: left; padding-right: 1.5rem">Settlement</th><td>{venue.settlement}, delivery versus payment</td></tr>
+      <tr><th style="text-align: left; padding-right: 1.5rem">Clearing</th><td>{venue.clearingHouse}</td></tr>
+      <tr><th style="text-align: left; padding-right: 1.5rem">Depository</th><td>{venue.depository}</td></tr>
+      <tr>
+        <th style="text-align: left; padding-right: 1.5rem">Scripless</th>
+        <td>{venue.scripless ? 'Yes, book-entry only' : 'No, physical certificates are still permitted'}</td>
+      </tr>
+      <tr><th style="text-align: left; padding-right: 1.5rem">Stamp duty</th><td>{venue.stampDuty}</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Sessions and auctions</h2>
+
+  {venue.preOpenSgt ? (
+    <p>
+      <strong>Pre-open.</strong> {venue.preOpenSgt.start} to {venue.preOpenSgt.end}
+      {venue.preOpenSgt.randomEnd ? `, ending at a random point within ${venue.preOpenSgt.randomEnd}` : ''}.{' '}
+      {venue.preOpenSgt.note}
+    </p>
+  ) : null}
+
+  {venue.auctionsSgt.length > 0 ? (
+    <>
+      <p><strong>Auctions.</strong></p>
+      <ul>
+        {venue.auctionsSgt.map((a) => (
+          <li><span class="tt-mono">{a.time}</span> — {a.name}</li>
+        ))}
+      </ul>
+    </>
+  ) : null}
+
+  {venue.tradeAtCloseSgt ? (
+    <p>
+      <strong>Trade at Close.</strong> <span class="tt-mono">{venue.tradeAtCloseSgt} SGT</span>, trading
+      at the fixed closing price. This window exists so a large order can be worked at a known price
+      instead of taking closing-auction risk.
+    </p>
+  ) : null}
+
+  {venue.nonCancelSgt.length > 0 ? (
+    <>
+      <p>
+        <strong>Non-cancel phases.</strong> No order entry, modification or cancellation in these
+        windows, so the auction price cannot be influenced once the phase has opened.
+      </p>
+      <ul>
+        {venue.nonCancelSgt.map((n) => (
+          <li><span class="tt-mono">{n}</span></li>
+        ))}
+      </ul>
+    </>
+  ) : null}
+
+  <h2>What this means for hedging</h2>
+  <p>
+    The session window determines when a barrier or a fixing can be observed and when a hedge can be
+    adjusted. Where the fixing source is not the instrument being hedged, the position carries a
+    basis risk that no single-venue model will show. The non-cancel and random-end windows matter for
+    the same reason: they limit when a level can be influenced, which is a structural difference
+    between these markets.
+  </p>
+
+  <p>
+    <strong>Practise this.</strong> The <a href={marketsQuiz}>Markets quiz</a> tests session times,
+    clearing and stamp duty across the venues, drawn from this dataset so the quiz and this page
+    cannot disagree.
+  </p>
+
+  <p class="tt-citation">
+    Source: <span class="tt-mono">src/data/sessions.json</span>, derived from{' '}
+    <span class="tt-mono">src/content/sgx-market-structure.md</span> and the exchange rulebooks it cites.
+    Verify against the exchange before relying on any figure here.
+  </p>
+</StarlightPage>

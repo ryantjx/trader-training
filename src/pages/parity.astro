@@ -1,0 +1,26 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { ParityGame } from '../components/games/ParityGame';
+
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'Put-call parity',
+    description: 'Fifteen questions, one hidden leg, judged to the penny.',
+  }}
+>
+  <p>
+    Find the missing leg of put-call parity. Fifteen questions, one variable hidden each time,
+    judged to two decimal places. This is the warm-up drill: the parity relationship underpins
+    every structure in the exotics section, and getting the rearrangement right without thinking
+    is the entry requirement.
+  </p>
+  <p class="tt-citation">
+    Marked to the penny, with no negative option values and the no-arbitrage bounds enforced. The
+    timer is informational and does not affect your score: the question is whether the arithmetic
+    is right, not how fast it was.
+  </p>
+
+  <ParityGame client:load />
+</StarlightPage>

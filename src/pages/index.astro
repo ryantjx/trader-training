@@ -1,0 +1,28 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { DailyChallenge } from '../components/games/DailyChallenge';
+import { quizDateKey } from '../lib/seed';
+
+const dateKey = quizDateKey();
+---
+
+<StarlightPage frontmatter={{ title: 'Today', description: 'The daily set: 20 mixed questions.' }}>
+  <p>
+    Twenty questions drawn from all three groups — <strong>Math</strong>, <strong>Markets</strong> and
+    <strong>Asia Derivatives</strong> — interleaved rather than blocked, because that is what a trading
+    day looks like. The set is generated from today's date, so every visitor gets the same questions
+    today and your score is comparable from one day to the next.
+  </p>
+  <p class="tt-citation">
+    Date key <span class="tt-mono">{dateKey}</span>, in Singapore time. The set rolls over at
+    midnight SGT so the change happens at one unambiguous moment wherever you are.
+  </p>
+
+  <DailyChallenge client:load mode="drill" />
+
+  <p class="tt-citation">
+    No account is needed and nothing is sent anywhere. Progress, personal bests and the
+    spaced-repetition queue are stored in this browser only. To work on a single group instead, use
+    the quizzes in the sidebar; see the About page to back up your progress.
+  </p>
+</StarlightPage>

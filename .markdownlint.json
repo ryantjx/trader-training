@@ -1,0 +1,8 @@
+{
+  "//": "Numbered top-level chapters are a deliberate structure for this spec, so multiple H1 headings are allowed. MD003 is pinned to atx because the document uses ATX throughout.",
+  "MD003": { "style": "atx" },
+  "MD025": false,
+  "MD013": false,
+  "MD033": false,
+  "MD034": false
+}
