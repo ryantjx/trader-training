@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { buildDailySet } from '../../lib/daily';
 import { mark } from '../../lib/marking';
+import { initialResponse } from '../../lib/responses';
 import { formatDuration, scoreSession } from '../../lib/scoring';
 import { createLocalStore, toStoredAnswers } from '../../lib/storage';
 import { quizDateKey } from '../../lib/seed';
@@ -39,9 +40,7 @@ export function DailyChallenge({ mode = 'drill', tier, dateKey }: DailyChallenge
   // numeric answer cannot leak into a choice question.
   useEffect(() => {
     if (!question) return;
-    if (question.kind === 'numeric') setResponse({ kind: 'numeric', value: null });
-    else if (question.kind === 'choice') setResponse({ kind: 'choice', optionId: null });
-    else setResponse({ kind: 'ordering', order: question.items.map((i) => i.id) });
+    setResponse(initialResponse(question));
     setLockedResult(null);
     setStartedAt(Date.now());
     setSecondsLeft(spec.secondsPerQuestion);

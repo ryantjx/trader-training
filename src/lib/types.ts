@@ -206,13 +206,35 @@ export interface OrderingQuestion extends QuestionBase {
   answerOrder: string[];
 }
 
-export type Question = NumericQuestion | ChoiceQuestion | OrderingQuestion;
+/**
+ * A free-text recall question.
+ *
+ * Added for the ticker drill: "which company is 9984 JT?" cannot be answered
+ * honestly as a four-way choice, because recognising a name among four printed
+ * options is a weaker test than producing the name. `accept` holds every variant
+ * that marks correct — the canonical answer plus aliases, legal suffixes and
+ * transliterations. Marking normalises case, punctuation and a small number of
+ * corporate suffixes before comparing, so "softbank group corp." matches
+ * "SoftBank Group".
+ */
+export interface TextQuestion extends QuestionBase {
+  kind: 'text';
+  /** Canonical answer, in `accept[0]`, shown in the feedback panel. */
+  answer: string;
+  /** Every accepted variant. Always contains `answer` itself. */
+  accept: string[];
+  /** Hint shown in the input, e.g. "Company name". */
+  placeholder?: string;
+}
+
+export type Question = NumericQuestion | ChoiceQuestion | OrderingQuestion | TextQuestion;
 
 /** What the trader submitted. */
 export type Response =
   | { kind: 'numeric'; value: number | null }
   | { kind: 'choice'; optionId: string | null }
-  | { kind: 'ordering'; order: string[] };
+  | { kind: 'ordering'; order: string[] }
+  | { kind: 'text'; text: string };
 
 export interface AnswerRecord {
   question: Question;

@@ -1,7 +1,7 @@
 /**
  * Ticker and market-structure drills (README section 2.2, five layers).
  *
- *   layer 1  ticker -> company name
+ *   layer 1  ticker -> company name     (multiple choice, and free text)
  *   layer 2  ticker -> sector
  *   layer 3  ticker -> market-cap band
  *   layer 4  ticker -> index membership
@@ -12,24 +12,42 @@
  * `borrowDifficulty`, `listedSingleStockDerivatives` and `offshoreHedgeable`
  * fields, so the question and the reference page cannot disagree.
  *
+ * Layer 1 is asked twice, and deliberately so. Recognising a name among four
+ * printed options is recall with a prompt; typing it from the code alone is the
+ * task the desk actually sets. Issue #1 asked for both, and the free-text form is
+ * marked through `markText` in marking.ts, which folds case, punctuation and
+ * corporate suffixes before comparing.
+ *
+ * Coverage. The SGX block of the dataset is verified to the 30 Sep 2026
+ * market-structure table, so it carries market cap, turnover and borrow. The HK,
+ * JP and AU blocks carry listing facts only (code, name, sector, venue); their
+ * numeric fields are null and every generator that needs one skips null rows.
+ * That is the difference between an unverified question and an unfair one.
+ *
  * Data is read from a JSON import rather than fs, so the same code runs in the
  * browser (where the daily set is generated) and in Node (where the tests run).
  */
 import tickersData from '../../data/tickers.json';
-import type { ChoiceOption, ChoiceQuestion, Generator, Rng, Tier } from '../types';
+import { normalizeTextAnswer } from '../marking';
+import type { ChoiceOption, ChoiceQuestion, Generator, Rng, TextQuestion, Tier } from '../types';
 
 export interface TickerRecord {
   id: string;
   ticker: string;
+  /** Ticker plus venue suffix, as the desk quotes it: 9984 JT, 700 HK, D05 SP. */
+  code: string;
   name: string;
+  /** Other spellings the free-text drill marks correct. */
+  aliases: string[];
   market: string;
   sector: string;
-  marketCapBn: number;
-  stiWeightPct: number;
-  adtM: number;
-  borrowDifficulty: 'easy' | 'moderate' | 'hard';
-  listedSingleStockDerivatives: boolean;
-  offshoreHedgeable: boolean;
+  /** Null where the venue block is not verified. Never guess a value. */
+  marketCapBn: number | null;
+  stiWeightPct: number | null;
+  adtM: number | null;
+  borrowDifficulty: 'easy' | 'moderate' | 'hard' | null;
+  listedSingleStockDerivatives: boolean | null;
+  offshoreHedgeable: boolean | null;
   inSti: boolean;
 }
 
@@ -50,9 +68,60 @@ interface AdtBand {
 const RECORDS = tickersData.instruments as TickerRecord[];
 const CAP_BANDS = tickersData.capBands as Band[];
 const ADT_BANDS = tickersData.adtBands as AdtBand[];
+const VENUES = tickersData.venues as Record<string, string>;
 
 export function allTickers(): TickerRecord[] {
   return RECORDS;
+}
+
+/** Venue name for the context line, falling back to the code itself. */
+export function venueName(market: string): string {
+  return VENUES[market] ?? market;
+}
+
+/**
+ * Short venue name for the suffix hint.
+ *
+ * The legal names are too long to sit in a context line and one of them, "Hong
+ * Kong Exchanges and Clearing", is also the name of a listed company (388 HK),
+ * which reads as a mistake next to a question about a different issuer.
+ */
+const VENUE_SHORT: Record<string, string> = {
+  SGX: 'Singapore',
+  TSE: 'Tokyo',
+  HKEX: 'Hong Kong',
+  ASX: 'Australia',
+};
+
+export function venueShortName(market: string): string {
+  return VENUE_SHORT[market] ?? market;
+}
+
+/** Records that carry a value for a numeric field the drill needs. */
+function withCap(): TickerRecord[] {
+  return RECORDS.filter((r) => r.marketCapBn !== null);
+}
+
+function withAdt(): TickerRecord[] {
+  return RECORDS.filter((r) => r.adtM !== null);
+}
+
+/**
+ * The STI-membership pool. A Japanese name is trivially outside the STI, so
+ * asking would test nothing; the question is only worth putting to a Singapore
+ * listing.
+ */
+function stiEligible(): TickerRecord[] {
+  return RECORDS.filter((r) => r.market === 'SGX');
+}
+
+/**
+ * The hedgeability pool. The explanation is sourced from the SGX reference page
+ * and only holds for SGX listings, so the pool is restricted to rows where the
+ * borrow field has actually been verified.
+ */
+function hedgeablePool(): TickerRecord[] {
+  return RECORDS.filter((r) => r.market === 'SGX' && r.borrowDifficulty !== null);
 }
 
 export function capBandOf(marketCapBn: number): Band {
@@ -83,9 +152,10 @@ function distractors(
   target: TickerRecord,
   exclude: (r: TickerRecord) => boolean,
   count: number,
+  pool: TickerRecord[] = RECORDS,
 ): TickerRecord[] {
-  const pool = RECORDS.filter((r) => r.id !== target.id && !exclude(r));
-  return rng.sample(pool, count);
+  const candidates = pool.filter((r) => r.id !== target.id && !exclude(r));
+  return rng.sample(candidates, count);
 }
 
 function build(
@@ -122,6 +192,34 @@ function build(
   };
 }
 
+/**
+ * The accepted answer set for a free-text naming question.
+ *
+ * The canonical name is first, because `TextQuestion.answer` is read from
+ * `accept[0]` and shown in the feedback panel. Variants that fold to the same
+ * normalised string are dropped, so the "also accepted" line does not list
+ * "CSL Limited" next to "CSL".
+ */
+export function acceptedNames(record: TickerRecord): string[] {
+  const canonical = normalizeTextAnswer(record.name);
+  const seen = new Set([canonical]);
+  const accept = [record.name];
+  for (const alias of record.aliases) {
+    const folded = normalizeTextAnswer(alias);
+    if (folded === '' || seen.has(folded)) continue;
+    seen.add(folded);
+    accept.push(alias);
+  }
+  return accept;
+}
+
+/** Citation that states what the row is actually verified to. */
+function nameCitation(record: TickerRecord): string {
+  return record.marketCapBn === null
+    ? 'README section 2.2; src/data/tickers.json — code, name and sector from the exchange listing. The numeric fields for this venue are not verified and are not asked.'
+    : 'README section 2.2; src/data/tickers.json and src/content/sgx-market-structure.md (30 Sep 2026).';
+}
+
 function nameFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
   const target = rng.pick(RECORDS);
   const others = distractors(rng, target, () => false, 3);
@@ -129,15 +227,37 @@ function nameFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
     rng,
     'tickers|name',
     'ticker-name',
-    `Which company is ${target.ticker} on ${target.market}?`,
-    'SGX tickers are numeric-looking codes rather than a recognisable abbreviation.',
-    `${target.ticker} is ${target.name}, a ${target.sector} name.`,
-    'Learn the exchange code first, then the business. In Singapore the code is not a mnemonic for anything.',
-    'README section 2.2; data from src/content/sgx-market-structure.md (30 Sep 2026).',
+    `Which company trades as ${target.code}?`,
+    `The suffix is the venue: ${target.code.slice(target.ticker.length + 1)} is ${venueShortName(target.market)}.`,
+    `${target.code} is ${target.name}, ${target.sector}, on ${venueName(target.market)}.`,
+    'Asian codes are numbers, not mnemonics: 9984 JT is Tokyo, 700 HK is Hong Kong, 5 HK is HSBC and not Tencent, D05 SP is Singapore, BHP AU is Sydney. Learn the pair, code and suffix.',
+    nameCitation(target),
     target.name,
     others.map((o) => o.name),
     tier,
   );
+}
+
+function nameFromTickerTyped(rng: Rng, tier: Tier): TextQuestion {
+  const target = rng.pick(RECORDS);
+  return {
+    kind: 'text',
+    id: `ticker-name-typed-${rng.int(0, 1_000_000).toString(36)}`,
+    generatorId: 'ticker-name-typed',
+    category: 'markets',
+    subgroup: 'tickers',
+    tier,
+    prompt: `Name the company that trades as ${target.code}.`,
+    context: `${venueName(target.market)}. Type the company name — the ticker will not be marked.`,
+    explain: `${target.code} is ${target.name}, ${target.sector}, on ${venueName(target.market)}.`,
+    anchor:
+      'Say the code, then the name, then the sector. Recall that skips the middle step is recognition, not memory, and it fails on a live ticket.',
+    citation: nameCitation(target),
+    signature: 'tickers|name-typed',
+    answer: target.name,
+    accept: acceptedNames(target),
+    placeholder: 'Company name',
+  };
 }
 
 function sectorFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
@@ -153,11 +273,11 @@ function sectorFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
     rng,
     'tickers|sector',
     'ticker-sector',
-    `What sector does ${target.name} (${target.ticker}) sit in?`,
-    `${target.market}, as at the data snapshot.`,
+    `What sector does ${target.name} (${target.code}) sit in?`,
+    `${venueName(target.market)}, as at the data snapshot.`,
     `${target.name} is classified as ${target.sector}.`,
-    'Singapore is structurally defensive: Financials and Real Estate/REITs dominate, and the three banks are about half of the STI.',
-    'README section 2.2; sector taxonomy from src/content/sgx-market-structure.md.',
+    'Singapore is structurally defensive: Financials and Real Estate/REITs dominate, and the three banks are about half of the STI. Hong Kong and Australia are Financials-heavy too; Japan is not, and Tokyo is where the exporter and semiconductor names sit.',
+    'README section 2.2; sector taxonomy from src/data/tickers.json and src/content/sgx-market-structure.md.',
     target.sector,
     options,
     tier,
@@ -165,14 +285,15 @@ function sectorFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
 }
 
 function capBandFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
-  const target = rng.pick(RECORDS);
-  const band = capBandOf(target.marketCapBn);
+  const pool = withCap();
+  const target = rng.pick(pool);
+  const band = capBandOf(target.marketCapBn as number);
   const others = CAP_BANDS.filter((b) => b.id !== band.id);
   return build(
     rng,
     'tickers|cap-band',
     'ticker-cap-band',
-    `Roughly what market-cap band does ${target.name} (${target.ticker}) sit in?`,
+    `Roughly what market-cap band does ${target.name} (${target.code}) sit in?`,
     `Bands: mega above S$100bn, large S$10-100bn, mid S$2-10bn, small below S$2bn.`,
     `${target.name} is ${band.label.toLowerCase()} cap at about S$${target.marketCapBn}bn.`,
     'Top 5 SGX names (three banks plus Singtel) are roughly 44% of total market cap. Concentration is the defining feature.',
@@ -184,7 +305,7 @@ function capBandFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
 }
 
 function indexMembership(rng: Rng, tier: Tier): ChoiceQuestion {
-  const target = rng.pick(RECORDS);
+  const target = rng.pick(stiEligible());
   const isSti = target.inSti;
   const correct = isSti ? 'Yes, it is an STI constituent' : 'No, it is outside the STI';
   const wrong = isSti ? 'No, it is outside the STI' : 'Yes, it is an STI constituent';
@@ -192,7 +313,7 @@ function indexMembership(rng: Rng, tier: Tier): ChoiceQuestion {
     rng,
     'tickers|index-membership',
     'ticker-index-membership',
-    `Is ${target.name} (${target.ticker}) a constituent of the Straits Times Index?`,
+    `Is ${target.name} (${target.code}) a constituent of the Straits Times Index?`,
     'The STI is the top 30 by free-float market cap, reviewed quarterly.',
     isSti
       ? `${target.name} is in the STI${target.stiWeightPct ? `, with an indicative weight of about ${target.stiWeightPct}%` : ''}.`
@@ -206,16 +327,17 @@ function indexMembership(rng: Rng, tier: Tier): ChoiceQuestion {
 }
 
 function liquidityBand(rng: Rng, tier: Tier): ChoiceQuestion {
-  const target = rng.pick(RECORDS);
-  const band = adtBandOf(target.adtM);
+  const target = rng.pick(withAdt());
+  const band = adtBandOf(target.adtM as number);
   const others = ADT_BANDS.filter((b) => b.id !== band.id);
+  const cap = target.marketCapBn as number | null;
   return build(
     rng,
     'tickers|liquidity',
     'ticker-liquidity',
-    `How liquid is ${target.name} (${target.ticker})? Choose the average daily turnover band.`,
+    `How liquid is ${target.name} (${target.code})? Choose the average daily turnover band.`,
     `Bands: deep above S$100m, active S$50-100m, moderate S$20-50m, thin below S$20m.`,
-    `${target.name} trades about S$${target.adtM}m/day, which is ${band.label.toLowerCase()}.${target.adtM < 50 && target.marketCapBn > 20 ? ' Note it is a sizeable company that trades less than you would expect: market cap alone misleads.' : ''}`,
+    `${target.name} trades about S$${target.adtM}m/day, which is ${band.label.toLowerCase()}.${(target.adtM as number) < 50 && cap !== null && cap > 20 ? ' Note it is a sizeable company that trades less than you would expect: market cap alone misleads.' : ''}`,
     'Market cap and liquidity are different questions. AEM is small (about S$3bn) yet trades about S$45m/day; plenty of larger names are less tradeable.',
     'README section 2.2; 3Q26 average daily turnover.',
     band.label,
@@ -225,18 +347,16 @@ function liquidityBand(rng: Rng, tier: Tier): ChoiceQuestion {
 }
 
 function hedgeability(rng: Rng, tier: Tier): ChoiceQuestion {
-  // Prefer names where the answer is instructive: no listed single-stock
-  // derivatives anywhere in the region, and hard-to-borrow.
-  const target = rng.pick(RECORDS);
+  const target = rng.pick(hedgeablePool());
   const correct = 'Index futures only: the single-name risk stays OTC';
 
   return build(
     rng,
     'tickers|hedgeability',
     'ticker-hedgeability',
-    `You are short a barrier option on ${target.name} (${target.ticker}) in size. What listed hedge is available?`,
+    `You are short a barrier option on ${target.name} (${target.code}) in size. What listed hedge is available?`,
     `The position is in size, and single-name liquidity in the region is thin outside a handful of names.`,
-    `Neither SGX nor HKEX lists single-stock options or single-stock futures, so ${target.ticker} has no listed vanilla hedge and borrow is ${target.borrowDifficulty}. Only the index delta is hedgeable on-exchange; the single-name gamma and vega must be sourced OTC, with the wider spreads, dealer dependence and harder marks that implies.`,
+    `Neither SGX nor HKEX lists single-stock options or single-stock futures, so ${target.code} has no listed vanilla hedge and borrow is ${target.borrowDifficulty}. Only the index delta is hedgeable on-exchange; the single-name gamma and vega must be sourced OTC, with the wider spreads, dealer dependence and harder marks that implies.`,
     'The hedge leg in Asia is index, but the risk is usually single-name. That mismatch is why the OTC vol market sets the price.',
     'README sections 2.2 and 4.5; src/content/sgx-market-structure.md (no listed single-stock derivatives on SGX or HKEX).',
     correct,
@@ -255,8 +375,16 @@ export const tickerGenerators: Generator[] = [
     category: 'markets',
     subgroup: 'tickers',
     tier: 1,
-    about: 'Ticker to company name.',
+    about: 'Ticker to company name, multiple choice.',
     generate: nameFromTicker,
+  },
+  {
+    id: 'ticker-name-typed',
+    category: 'markets',
+    subgroup: 'tickers',
+    tier: 2,
+    about: 'Ticker to company name, free text: name the company from the code alone.',
+    generate: nameFromTickerTyped,
   },
   {
     id: 'ticker-sector',
@@ -271,7 +399,7 @@ export const tickerGenerators: Generator[] = [
     category: 'markets',
     subgroup: 'tickers',
     tier: 2,
-    about: 'Ticker to market-cap band.',
+    about: 'Ticker to market-cap band. SGX names only — the other venues are not verified.',
     generate: capBandFromTicker,
   },
   {
@@ -287,7 +415,7 @@ export const tickerGenerators: Generator[] = [
     category: 'markets',
     subgroup: 'tickers',
     tier: 3,
-    about: 'Ticker to average daily turnover band.',
+    about: 'Ticker to average daily turnover band. SGX names only.',
     generate: liquidityBand,
   },
   {
