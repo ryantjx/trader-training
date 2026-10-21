@@ -3,28 +3,25 @@ import { buildDailySet } from '../../lib/daily';
 import { mark } from '../../lib/marking';
 import { initialResponse } from '../../lib/responses';
 import { formatDuration, scoreSession } from '../../lib/scoring';
-import { createLocalStore, toStoredAnswers } from '../../lib/storage';
 import { quizDateKey } from '../../lib/seed';
 import { timeMode, type TimeMode } from '../../lib/modes';
-import { review } from '../../lib/srs';
-import type { AnswerRecord, Response, Tier } from '../../lib/types';
+import { CATEGORY_LABELS } from '../../lib/types';
+import type { AnswerRecord, Response } from '../../lib/types';
 import { QuestionCard } from './QuestionCard';
 import { FeedbackPanel } from './FeedbackPanel';
 import { ResultSummary } from './ResultSummary';
 
 export interface DailyChallengeProps {
   mode?: TimeMode;
-  tier?: Tier;
   /** Fixed date, for tests and for replaying a past set. */
   dateKey?: string;
 }
 
-export function DailyChallenge({ mode = 'drill', tier, dateKey }: DailyChallengeProps) {
+export function DailyChallenge({ mode = 'drill', dateKey }: DailyChallengeProps) {
   const resolvedDate = dateKey ?? quizDateKey();
   const spec = timeMode(mode);
-  const resolvedTier = tier ?? spec.defaultTier;
 
-  const set = useMemo(() => buildDailySet(resolvedDate, resolvedTier), [resolvedDate, resolvedTier]);
+  const set = useMemo(() => buildDailySet(resolvedDate), [resolvedDate]);
 
   const [index, setIndex] = useState(0);
   const [response, setResponse] = useState<Response>({ kind: 'numeric', value: null });
@@ -53,13 +50,18 @@ export function DailyChallenge({ mode = 'drill', tier, dateKey }: DailyChallenge
 
     setLockedResult(result);
     setRecords((prev) => [...prev, { question, response, correct: result.correct, elapsedMs }]);
-
-    // Spaced repetition: the concept, not the instance.
-    const store = createLocalStore();
-    const srs = store.getSrs();
-    srs[question.signature] = review(srs[question.signature], question.signature, result.correct);
-    store.saveSrs(srs);
   }, [question, response, lockedResult, startedAt]);
+
+  const selectChoice = useCallback((optionId: string) => {
+    if (!question || question.kind !== 'choice' || lockedResult) return;
+    const nextResponse: Response = { kind: 'choice', optionId };
+    const result = mark(question, nextResponse);
+    const elapsedMs = Date.now() - startedAt;
+
+    setResponse(nextResponse);
+    setLockedResult(result);
+    setRecords((prev) => [...prev, { question, response: nextResponse, correct: result.correct, elapsedMs }]);
+  }, [question, lockedResult, startedAt]);
 
   // Per-question countdown. Stops once the question is locked, so reading the
   // explanation is never timed.
@@ -99,19 +101,6 @@ export function DailyChallenge({ mode = 'drill', tier, dateKey }: DailyChallenge
 
   const score = useMemo(() => scoreSession(records), [records]);
 
-  // Persist once, on completion. saveDaily overwrites by date, so replaying the
-  // same day replaces the record rather than duplicating it.
-  useEffect(() => {
-    if (!finished) return;
-    const store = createLocalStore();
-    store.saveDaily({
-      dateKey: resolvedDate,
-      completedAt: new Date().toISOString(),
-      score,
-      answers: toStoredAnswers(records),
-    });
-  }, [finished, resolvedDate, score, records]);
-
   if (finished) {
     return (
       <ResultSummary
@@ -141,7 +130,7 @@ export function DailyChallenge({ mode = 'drill', tier, dateKey }: DailyChallenge
       </div>
 
       <p className="tt-citation" style={{ marginTop: 0 }}>
-        {timeMode(mode).label} mode · tier {resolvedTier} · {question.category}
+        {timeMode(mode).label} mode · {CATEGORY_LABELS[question.category]}
       </p>
 
       <QuestionCard
@@ -150,6 +139,7 @@ export function DailyChallenge({ mode = 'drill', tier, dateKey }: DailyChallenge
         onChange={setResponse}
         locked={lockedResult !== null}
         onSubmit={submit}
+        onChoiceSelect={selectChoice}
         secondsLeft={secondsLeft}
       />
 

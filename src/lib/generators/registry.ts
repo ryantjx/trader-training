@@ -28,8 +28,7 @@ import {
   type Category,
   type Generator,
   type Subgroup,
-  type Tier,
-} from '../types';
+  } from '../types';
 
 export interface RegisteredGenerator extends Generator {
   /** False when the generator's data is not verified and it must not be asked. */
@@ -123,15 +122,4 @@ export function populatedCategories(): Category[] {
 
 export function generatorById(id: string): RegisteredGenerator | undefined {
   return GENERATORS.find((g) => g.id === id);
-}
-
-/**
- * Generators usable at a given tier. A generator is usable at its own tier and
- * above, so the daily set can be filled for a lower tier from easier generators
- * and for a higher tier from the harder ones.
- */
-export function generatorsAtTier(category: Category, tier: Tier): RegisteredGenerator[] {
-  const all = availableGenerators().filter((g) => g.category === category);
-  const atOrBelow = all.filter((g) => g.tier <= tier);
-  return atOrBelow.length > 0 ? atOrBelow : all;
 }

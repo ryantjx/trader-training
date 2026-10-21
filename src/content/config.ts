@@ -21,11 +21,13 @@ const docs = defineCollection({
 });
 
 /**
- * The market-structure research note at src/content/sgx-market-structure.md.
+ * The market-structure research note at src/content/asia-market-structure.md.
  *
- * Kept at that path because it is referenced from the project README and from
- * the generator comments. It is source material, not site content, so it is a
- * collection rather than a published page.
+ * It is source material rather than site content: the published version of this
+ * material is the manual under src/content/docs/manual/, which is written for a
+ * reader, whereas this note is the sourced evidence behind it (rulebook links,
+ * as-of dates, quoted figures). Keeping the two apart means the site can be
+ * edited for clarity without losing the provenance.
  */
 const research = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content' }),

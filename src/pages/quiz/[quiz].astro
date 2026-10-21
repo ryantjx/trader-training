@@ -2,17 +2,22 @@
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { FreeDrill } from '../../components/games/FreeDrill';
 import { ParityGame } from '../../components/games/ParityGame';
-import { generatorsForQuiz } from '../../lib/generators/registry';
+import { TickerMatch } from '../../components/games/TickerMatch';
+import { glossaryEntries } from '../../lib/glossary';
+import { guideFor } from '../../lib/quiz-guides';
 import { url } from '../../lib/url';
 import { CATEGORY_LABELS, GROUP_SLUGS, type Category, type Subgroup } from '../../lib/types';
 
 // Defined inline: Astro binds getStaticPaths to the page module. It is also
 // hoisted above the rest of the frontmatter, so it must not close over
 // module-scope constants — every value is repeated inside it.
+//
+// The quiz list itself lives in `QUIZZES`; this function only maps it to route
+// params, so a new quiz cannot be added to the sidebar and forgotten here.
 export function getStaticPaths() {
   const quizzes: { subgroup: Subgroup; category: Category; label: string }[] = [
     { subgroup: 'greeks', category: 'math', label: 'Greeks and PnL' },
-    { subgroup: 'put-call-parity', category: 'math', label: 'Put-call parity' },
+    { subgroup: 'put-call-parity', category: 'math', label: 'Put-Call Parity' },
     { subgroup: 'basis-points', category: 'math', label: 'Basis points and money' },
     { subgroup: 'fx', category: 'math', label: 'FX' },
     { subgroup: 'forwards', category: 'math', label: 'Forwards' },
@@ -29,45 +34,82 @@ export function getStaticPaths() {
 
 const { quiz } = Astro.props as { quiz: { subgroup: Subgroup; category: Category; label: string } };
 
-const generators = generatorsForQuiz(quiz.subgroup);
+const guide = guideFor(quiz.subgroup);
+const terms = glossaryEntries(guide.terms);
 const groupHref = url(`group/${GROUP_SLUGS[quiz.category]}`);
 ---
 
 <StarlightPage
   frontmatter={{
     title: quiz.label,
-    description: `Practise ${quiz.label}, in ${CATEGORY_LABELS[quiz.category]}.`,
+    description: guide.purpose,
   }}
 >
   <p class="tt-citation">
-    <a href={groupHref}>{CATEGORY_LABELS[quiz.category]}</a> › {quiz.label} ·{' '}
-    {generators.length} generator{generators.length === 1 ? '' : 's'}
+    <a href={groupHref}>{CATEGORY_LABELS[quiz.category]}</a> › {quiz.label}
+    <span> · {guide.minutes} min</span>
   </p>
+
+  <p>{guide.purpose}</p>
+
+  <p class="tt-note">
+    <strong>Why a desk cares.</strong> {guide.whyItMatters}
+  </p>
+
+  <details style="margin-top: 1.25rem">
+    <summary style="cursor: pointer">
+      <strong>Background before you start</strong>
+      <span class="tt-citation"> — the method, without the pressure of a timer</span>
+    </summary>
+    <p style="margin-top: 0.75rem">{guide.method}</p>
+    <p class="tt-anchor">Rule of thumb: {guide.anchor}</p>
+    <p class="tt-citation">
+      Full treatment, worked examples and the surrounding theory: <a href={url(guide.manualPath)}>the manual</a>.
+    </p>
+  </details>
 
   {quiz.subgroup === 'put-call-parity' ? (
     <p>
-      The competitive version: fifteen questions, one hidden leg each time, scored to the penny with
-      your personal best shown on the start screen. The timer pauses between questions and does not
-      affect your score.
+      The competitive version: fifteen questions, one hidden leg each time, scored to the penny. The
+      timer pauses between questions and does not affect your score.
     </p>
   ) : null}
 
-  {/* The quiz comes first: this is a quiz site. */}
-  {quiz.subgroup === 'put-call-parity' ? <ParityGame client:load /> : <FreeDrill client:load subgroup={quiz.subgroup} />}
+  {/* The quiz comes first among the interactive elements: this is a quiz site. */}
+  {quiz.subgroup === 'tickers' ? (
+    <>
+      <h2>Ticker Information Game</h2>
+      <FreeDrill client:load subgroup={quiz.subgroup} />
+      <h2>Ticker Matching Game</h2>
+      <p>Choose a market, then match exchange codes and RIC tickers with company names in either direction.</p>
+      <TickerMatch client:load />
+    </>
+  ) : quiz.subgroup === 'put-call-parity' ? (
+    <ParityGame client:load />
+  ) : (
+    <FreeDrill client:load subgroup={quiz.subgroup} />
+  )}
 
-  <details style="margin-top: 2rem">
-    <summary style="cursor: pointer">What this quiz tests</summary>
-    <ul>
-      {generators.map((generator) => (
-        <li>
-          <span class="tt-mono">{generator.id}</span> — {generator.about}
-        </li>
-      ))}
-    </ul>
-  </details>
+  <h2 style="margin-top: 2rem">What this tests</h2>
+  <p>{guide.whatThisTests}</p>
+
+  {terms.length > 0 ? (
+    <>
+      <h2>Terms used here</h2>
+      <p class="tt-citation">
+        {terms.map((term, index) => (
+          <>
+            {index > 0 ? ' · ' : ''}
+            <a href={`${url('manual/glossary')}#${term.id}`} title={term.expansion}>
+              {term.term}
+            </a>
+          </>
+        ))}
+      </p>
+    </>
+  ) : null}
 
   <p class="tt-citation" style="margin-top: 1.5rem">
-    Untimed and unlimited. Nothing here affects your daily record, but anything you miss still feeds
-    the spaced-repetition queue. For the set that mixes every group, play <a href={url('')}>Today</a>.
+    Untimed and unlimited. For the set that mixes every group, play <a href={url('today')}>Today</a>.
   </p>
 </StarlightPage>

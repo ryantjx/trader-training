@@ -5,6 +5,7 @@
   --tt-correct: #1a7f4b;
   --tt-wrong: #b4243a;
   --tt-flag: #b07d00;
+  --tt-accent: #3b6fd4;
   --tt-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
@@ -45,6 +46,17 @@
   font-style: italic;
 }
 
+/* Load-bearing guidance: the timer, the scope, "why a desk cares".
+   Deliberately not grey-on-grey like .tt-citation, because it is meant to be
+   read before starting rather than after. */
+.tt-note {
+  font-size: 0.95rem;
+  border-left: 3px solid var(--tt-accent);
+  padding-left: 0.75rem;
+  margin-block: 1rem;
+  color: var(--sl-color-text);
+}
+
 .tt-citation {
   font-size: 0.8rem;
   color: var(--sl-color-gray-4);
@@ -66,6 +78,52 @@
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
+}
+
+.tt-segmented {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.tt-segmented button[aria-selected="true"],
+.tt-segmented button[aria-pressed="true"] {
+  border-color: var(--tt-accent);
+  background: color-mix(in srgb, var(--tt-accent) 15%, transparent);
+}
+
+.tt-choice-option {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.35rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tt-choice-option:hover:not(:disabled) {
+  border-color: var(--tt-accent);
+}
+
+.tt-choice-option:disabled {
+  cursor: default;
+}
+
+.tt-choice-correct {
+  border-color: var(--tt-correct);
+  background: color-mix(in srgb, var(--tt-correct) 14%, transparent);
+}
+
+.tt-choice-wrong {
+  border-color: var(--tt-wrong);
+  background: color-mix(in srgb, var(--tt-wrong) 14%, transparent);
+}
+
+.tt-choice-locked {
+  opacity: 0.65;
 }
 
 .tt-stale {

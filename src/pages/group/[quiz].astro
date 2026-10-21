@@ -3,7 +3,8 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { FreeDrill } from '../../components/games/FreeDrill';
 import { generatorsBySubgroup } from '../../lib/generators/registry';
 import { url } from '../../lib/url';
-import { CATEGORY_DESCRIPTIONS, type Category } from '../../lib/types';
+import { GROUP_GUIDES, QUIZ_GUIDES, groupMinutes } from '../../lib/quiz-guides';
+import type { Category } from '../../lib/types';
 
 // Defined inline: Astro binds getStaticPaths to the page module, so a re-export
 // from a helper would break route generation. Astro also hoists this function
@@ -22,32 +23,67 @@ export function getStaticPaths() {
 
 const { category, label } = Astro.props as { category: Category; label: string };
 
+const guide = GROUP_GUIDES[category];
+const minutes = groupMinutes(category);
+
 // Each quiz inside the group, so this page doubles as the group's index.
-const quizzes = generatorsBySubgroup(category);
+const quizzes = generatorsBySubgroup(category).map((quiz) => ({
+  ...quiz,
+  guide: QUIZ_GUIDES[quiz.subgroup],
+}));
 ---
 
 <StarlightPage
-  frontmatter={{ title: `${label} quizzes`, description: `The ${label} quizzes, and a mixed drill across all of them.` }}
+  frontmatter={{ title: `${label} quizzes`, description: guide.purpose }}
 >
-  <p>{CATEGORY_DESCRIPTIONS[category]}</p>
+  <p>{guide.purpose}</p>
+
+  <p class="tt-note">
+    <strong>Why a desk cares.</strong> {guide.whyItMatters}
+  </p>
+  <p class="tt-citation">
+    A pass through this group should leave you able to: {guide.outcome}
+  </p>
+
+  <p>
+    <a href={url(guide.manualPath)}>Read the background first</a> — the manual section that covers
+    everything here. Or start with a quiz below and read afterwards; the drills explain the method
+    either way.
+  </p>
 
   <h2>Quizzes in this group</h2>
-  <ul>
-    {quizzes.map((quiz) => (
-      <li>
-        <a href={url(`quiz/${quiz.subgroup}`)}>{quiz.label}</a>
-        <span class="tt-citation"> — {quiz.generators.length} generator{quiz.generators.length === 1 ? '' : 's'}</span>
-      </li>
-    ))}
-  </ul>
+  <p class="tt-citation">
+    {minutes} minutes in total for one pass through every quiz in this group.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align: left; padding-right: 1.5rem">Quiz</th>
+        <th style="text-align: left; padding-right: 1.5rem">What it tests</th>
+        <th style="text-align: left">Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {quizzes.map((quiz) => (
+        <tr>
+          <td style="text-align: left; padding-right: 1.5rem">
+            <a href={url(`quiz/${quiz.subgroup}`)}>{quiz.label}</a>
+          </td>
+          <td style="text-align: left; padding-right: 1.5rem">{quiz.guide.purpose}</td>
+          <td style="text-align: left" class="tt-mono">{quiz.guide.minutes} min</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
 
   <h2>Mixed drill</h2>
   <p class="tt-citation">
-    Draws from every generator in the group rather than one quiz, untimed and unlimited.
+    Draws from every generator in the group rather than one quiz, untimed and unlimited, and scored
+    only within the session.
   </p>
   <FreeDrill client:load category={category} />
 
   <p class="tt-citation" style="margin-top: 1.5rem">
-    For the set that mixes all three groups, play <a href={url('')}>Today</a>.
+    For the set that mixes all three groups, play <a href={url('today')}>Today</a>.
   </p>
 </StarlightPage>

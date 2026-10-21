@@ -1,0 +1,2442 @@
+{
+  "asOf": "2026-10-21",
+  "note": "Name and exchange-code reference data for the matching drill. This file carries no market-cap, liquidity or borrow assertions. HK and JP use broad listed-equity universes; SG and AU are expanded matching pools.",
+  "markets": {
+    "HK": {
+      "label": "Hong Kong",
+      "venue": "HKEX",
+      "ricSuffix": ".HK",
+      "index": "HKEX listed equities",
+      "source": "HKEX listing directory reference via Wikipedia MediaWiki API; code/name snapshot accessed 21 Oct 2026",
+      "instruments": [
+        {
+          "code": "0001",
+          "name": "CK Hutchison Holdings"
+        },
+        {
+          "code": "0002",
+          "name": "CLP Holdings Limited"
+        },
+        {
+          "code": "0003",
+          "name": "The Hong Kong and China Gas Company Limited"
+        },
+        {
+          "code": "0004",
+          "name": "The Wharf (Holdings) Limited"
+        },
+        {
+          "code": "0005",
+          "name": "HSBC Holdings plc"
+        },
+        {
+          "code": "0006",
+          "name": "Power Assets Holdings Limited"
+        },
+        {
+          "code": "0007",
+          "name": "Hong Kong Finance Investment Holding Group Limited"
+        },
+        {
+          "code": "0008",
+          "name": "PCCW Limited"
+        },
+        {
+          "code": "0009",
+          "name": "Nine Express Limited"
+        },
+        {
+          "code": "0010",
+          "name": "Hang Lung Group"
+        },
+        {
+          "code": "0011",
+          "name": "Hang Seng Bank Ltd."
+        },
+        {
+          "code": "0012",
+          "name": "Henderson Land Development Co. Ltd."
+        },
+        {
+          "code": "0014",
+          "name": "Hysan Development"
+        },
+        {
+          "code": "0015",
+          "name": "Vantage International (Holdings) Ltd."
+        },
+        {
+          "code": "0016",
+          "name": "Sun Hung Kai Properties Ltd."
+        },
+        {
+          "code": "0017",
+          "name": "New World Development Co., Ltd."
+        },
+        {
+          "code": "0018",
+          "name": "Oriental Press"
+        },
+        {
+          "code": "0019",
+          "name": "Swire Pacific Ltd."
+        },
+        {
+          "code": "0020",
+          "name": "Wheelock"
+        },
+        {
+          "code": "0022",
+          "name": "Mexan"
+        },
+        {
+          "code": "0023",
+          "name": "The Bank of East Asia, Ltd."
+        },
+        {
+          "code": "0025",
+          "name": "Chevalier International Holdings Ltd."
+        },
+        {
+          "code": "0026",
+          "name": "China Motor Bus"
+        },
+        {
+          "code": "0027",
+          "name": "Galaxy Entertainment Group"
+        },
+        {
+          "code": "0029",
+          "name": "Dynamic Holdings Limited"
+        },
+        {
+          "code": "0030",
+          "name": "ABC Communications (Holdings) Ltd."
+        },
+        {
+          "code": "0031",
+          "name": "China Aerospace International Holdings"
+        },
+        {
+          "code": "0032",
+          "name": "The Cross-Harbour (Holdings) Limited"
+        },
+        {
+          "code": "0033",
+          "name": "Asia Investment Finance Group Limited"
+        },
+        {
+          "code": "0034",
+          "name": "Kowloon Development Company Ltd."
+        },
+        {
+          "code": "0035",
+          "name": "Far East Consortium International Ltd."
+        },
+        {
+          "code": "0036",
+          "name": "Far East Technology International Ltd."
+        },
+        {
+          "code": "0037",
+          "name": "Far East Hotels and Entertainment Ltd."
+        },
+        {
+          "code": "0038",
+          "name": "First Tractor Company Limited"
+        },
+        {
+          "code": "0039",
+          "name": "China Beidahuang Industry Group Holdings Limited"
+        },
+        {
+          "code": "0040",
+          "name": "Gold Peak Technology Group Ltd."
+        },
+        {
+          "code": "0041",
+          "name": "Great Eagle Holdings"
+        },
+        {
+          "code": "0042",
+          "name": "Northeast Electric Development Company Limited"
+        },
+        {
+          "code": "0043",
+          "name": "C.P. Pokphand Co. Ltd."
+        },
+        {
+          "code": "0044",
+          "name": "Hong Kong Aircraft Engineering Company"
+        },
+        {
+          "code": "0045",
+          "name": "The Hongkong and Shanghai Hotels, Limited"
+        },
+        {
+          "code": "0046",
+          "name": "Computer & Technologies Holdings Ltd."
+        },
+        {
+          "code": "0047",
+          "name": "Hop Hing Group Holdings Limited"
+        },
+        {
+          "code": "0048",
+          "name": "China Automotive Interior Decoration Holdings Limited"
+        },
+        {
+          "code": "0050",
+          "name": "Hong Kong Ferry (Holdings) Co. Ltd."
+        },
+        {
+          "code": "0051",
+          "name": "Harbour Centre Development"
+        },
+        {
+          "code": "0052",
+          "name": "Fairwood Holdings Limited"
+        },
+        {
+          "code": "0053",
+          "name": "Guoco Group"
+        },
+        {
+          "code": "0054",
+          "name": "Hopewell Holdings Limited"
+        },
+        {
+          "code": "0055",
+          "name": "Neway Group Holdings Ltd."
+        },
+        {
+          "code": "0056",
+          "name": "Allied Properties (H.K.) Ltd."
+        },
+        {
+          "code": "0057",
+          "name": "Chen Hsong Holdings Ltd."
+        },
+        {
+          "code": "0058",
+          "name": "Sunway International Holdings Ltd."
+        },
+        {
+          "code": "0059",
+          "name": "Skyfame Realty (Holdings) Limited"
+        },
+        {
+          "code": "0061",
+          "name": "Venture International Investment Holdings Limited"
+        },
+        {
+          "code": "0062",
+          "name": "Transport International Holdings Limited"
+        },
+        {
+          "code": "0063",
+          "name": "Winfoong"
+        },
+        {
+          "code": "0064",
+          "name": "Get Nice Holdings Ltd."
+        },
+        {
+          "code": "0065",
+          "name": "De Team"
+        },
+        {
+          "code": "0066",
+          "name": "MTR Corporation Ltd."
+        },
+        {
+          "code": "0068",
+          "name": "Lee Hing Development Limited"
+        },
+        {
+          "code": "0069",
+          "name": "Shangri-La Asia Ltd."
+        },
+        {
+          "code": "0070",
+          "name": "Neptune Group"
+        },
+        {
+          "code": "0071",
+          "name": "Miramar Hotel and Investment"
+        },
+        {
+          "code": "0074",
+          "name": "Great Wall Technology Company Ltd."
+        },
+        {
+          "code": "0075",
+          "name": "Y. T. Realty Group Limited"
+        },
+        {
+          "code": "0076",
+          "name": "South Sea Petroleum Holdings Limited"
+        },
+        {
+          "code": "0077",
+          "name": "AMS Public Transport Holdings Limited"
+        },
+        {
+          "code": "0078",
+          "name": "Regal Hotels International Holdings Limited"
+        },
+        {
+          "code": "0079",
+          "name": "Century Legend"
+        },
+        {
+          "code": "0080",
+          "name": "China New Economy Fund Ltd."
+        },
+        {
+          "code": "0081",
+          "name": "Shell Electric"
+        },
+        {
+          "code": "0082",
+          "name": "VODONE"
+        },
+        {
+          "code": "0083",
+          "name": "Sino Land Co. Ltd."
+        },
+        {
+          "code": "0086",
+          "name": "Sun Hung Kai & Co. Ltd."
+        },
+        {
+          "code": "0087",
+          "name": "Swire Pacific Ltd."
+        },
+        {
+          "code": "0089",
+          "name": "Tai Sang Land Development Ltd."
+        },
+        {
+          "code": "0092",
+          "name": "Champion Technology Holdings Ltd."
+        },
+        {
+          "code": "0094",
+          "name": "Greenheart Group"
+        },
+        {
+          "code": "0095",
+          "name": "New Heritage Holdings Ltd."
+        },
+        {
+          "code": "0096",
+          "name": "Yusei Holdings Ltd."
+        },
+        {
+          "code": "0097",
+          "name": "Henderson Investment Ltd."
+        },
+        {
+          "code": "0098",
+          "name": "Xingfa Aluminium Holdings Limited"
+        },
+        {
+          "code": "0099",
+          "name": "Wongs Int'l"
+        },
+        {
+          "code": "0100",
+          "name": "Clear Media Limited"
+        },
+        {
+          "code": "0101",
+          "name": "Hang Lung Properties"
+        },
+        {
+          "code": "0102",
+          "name": "Arnhold Holdings Ltd."
+        },
+        {
+          "code": "0103",
+          "name": "Shougang Concord Century Holdings Ltd."
+        },
+        {
+          "code": "0104",
+          "name": "Asia Commercial Holdings Limited"
+        },
+        {
+          "code": "0105",
+          "name": "Associated International Hotels Limited"
+        },
+        {
+          "code": "0106",
+          "name": "Landsea Green Group Co., Ltd."
+        },
+        {
+          "code": "0107",
+          "name": "Sichuan Expressway Co. Ltd."
+        },
+        {
+          "code": "0109",
+          "name": "Wonderful World Holdings Ltd."
+        },
+        {
+          "code": "0110",
+          "name": "Fortune Telecom Holdings Limited"
+        },
+        {
+          "code": "0112",
+          "name": "Chi Cheung Investment Co. Ltd."
+        },
+        {
+          "code": "0113",
+          "name": "Dickson Concepts (International) Ltd."
+        },
+        {
+          "code": "0114",
+          "name": "Herald Holdings Ltd."
+        },
+        {
+          "code": "0116",
+          "name": "Chow Sang Sang Holdings Int'l Ltd."
+        },
+        {
+          "code": "0117",
+          "name": "EYANG Holdings (Group) Co., Ltd."
+        },
+        {
+          "code": "0118",
+          "name": "Cosmos Machinery Enterprises Ltd."
+        },
+        {
+          "code": "0119",
+          "name": "Poly Property"
+        },
+        {
+          "code": "0120",
+          "name": "Cosmopolitan International Holdings Ltd."
+        },
+        {
+          "code": "0121",
+          "name": "Chia Tai Enterprises International Ltd."
+        },
+        {
+          "code": "0122",
+          "name": "Crocodile Garments"
+        },
+        {
+          "code": "0123",
+          "name": "Yuexiu Property"
+        },
+        {
+          "code": "0124",
+          "name": "Kingway Brewery Holdings Limited"
+        },
+        {
+          "code": "0127",
+          "name": "Chinese Estates Holdings"
+        },
+        {
+          "code": "0128",
+          "name": "ENM Holdings Limited"
+        },
+        {
+          "code": "0129",
+          "name": "Asia Standard Int'l Group Ltd."
+        },
+        {
+          "code": "0130",
+          "name": "Moiselle International Holdings Limited"
+        },
+        {
+          "code": "0131",
+          "name": "Cheuk Nang Holding Limited"
+        },
+        {
+          "code": "0132",
+          "name": "China Investment Holding Limited"
+        },
+        {
+          "code": "0133",
+          "name": "China Merchants China Direct Investments Ltd."
+        },
+        {
+          "code": "0135",
+          "name": "Kunlun Energy"
+        },
+        {
+          "code": "0136",
+          "name": "Mascotte Holdings Ltd."
+        },
+        {
+          "code": "0138",
+          "name": "CCT Telecom Holdings Ltd."
+        },
+        {
+          "code": "0139",
+          "name": "139 Holdings Ltd."
+        },
+        {
+          "code": "0142",
+          "name": "First Pacific"
+        },
+        {
+          "code": "0144",
+          "name": "China Merchants Holdings (Int'l) Co. Ltd."
+        },
+        {
+          "code": "0146",
+          "name": "Tai Ping Carpets Int'l Ltd."
+        },
+        {
+          "code": "0147",
+          "name": "Graneagle Holdings Ltd."
+        },
+        {
+          "code": "0148",
+          "name": "Kingboard Holdings"
+        },
+        {
+          "code": "0149",
+          "name": "China Agri-Products Exchange Ltd."
+        },
+        {
+          "code": "0151",
+          "name": "Want Want China"
+        },
+        {
+          "code": "0152",
+          "name": "Shenzhen International Holdings"
+        },
+        {
+          "code": "0154",
+          "name": "Beijing Development (Hong Kong) Ltd."
+        },
+        {
+          "code": "0155",
+          "name": "China Solar Energy Holdings Ltd."
+        },
+        {
+          "code": "0156",
+          "name": "Lippo China Resources Limited"
+        },
+        {
+          "code": "0158",
+          "name": "Melbourne Enterprises Ltd."
+        },
+        {
+          "code": "0163",
+          "name": "Emperor International Holdings Limited"
+        },
+        {
+          "code": "0164",
+          "name": "China Baoli Technologies Holdings Ltd."
+        },
+        {
+          "code": "0165",
+          "name": "China Everbright Limited"
+        },
+        {
+          "code": "0166",
+          "name": "New Times Group Holdings Ltd."
+        },
+        {
+          "code": "0167",
+          "name": "IDT Int'l Ltd."
+        },
+        {
+          "code": "0168",
+          "name": "Tsingtao Brewery"
+        },
+        {
+          "code": "0169",
+          "name": "China Fair Land Holdings Limited"
+        },
+        {
+          "code": "0171",
+          "name": "Silver Grant International Industries Ltd."
+        },
+        {
+          "code": "0173",
+          "name": "K. Wah International Holdings Ltd."
+        },
+        {
+          "code": "0174",
+          "name": "Kee Shing (Holdings) Ltd."
+        },
+        {
+          "code": "0175",
+          "name": "Geely Automobile Holdings Ltd."
+        },
+        {
+          "code": "0176",
+          "name": "United Pacific Industries Ltd."
+        },
+        {
+          "code": "0177",
+          "name": "Jiangsu Expressway Company"
+        },
+        {
+          "code": "0178",
+          "name": "Sa Sa Int'l Holdings Ltd."
+        },
+        {
+          "code": "0179",
+          "name": "Johnson Electric Holdings Ltd."
+        },
+        {
+          "code": "0182",
+          "name": "Concord New Energy"
+        },
+        {
+          "code": "0183",
+          "name": "CITIC International Financial Holdings Limited"
+        },
+        {
+          "code": "0186",
+          "name": "Grande Holdings"
+        },
+        {
+          "code": "0188",
+          "name": "SW Kingsway Capital Holdings Ltd."
+        },
+        {
+          "code": "0189",
+          "name": "Dongyue Group Limited"
+        },
+        {
+          "code": "0190",
+          "name": "Hong Kong Construction (Holdings) Ltd."
+        },
+        {
+          "code": "0191",
+          "name": "Lai Sun Garment (International) Limited"
+        },
+        {
+          "code": "0193",
+          "name": "Capital Estate Limited"
+        },
+        {
+          "code": "0194",
+          "name": "Liu Chong Hing Investment Ltd."
+        },
+        {
+          "code": "0196",
+          "name": "Honghua Group Limited"
+        },
+        {
+          "code": "0197",
+          "name": "Heng Tai Consumables Group Limited"
+        },
+        {
+          "code": "0198",
+          "name": "SMI Corporation Limited"
+        },
+        {
+          "code": "0200",
+          "name": "Melco International Development Limited"
+        },
+        {
+          "code": "0201",
+          "name": "Magnificent Estates Ltd."
+        },
+        {
+          "code": "0202",
+          "name": "Interchina Holdings Ltd."
+        },
+        {
+          "code": "0203",
+          "name": "Denway Motors Limited"
+        },
+        {
+          "code": "0204",
+          "name": "Temujin International Investments Ltd."
+        },
+        {
+          "code": "0205",
+          "name": "SEEC Media Group Limited"
+        },
+        {
+          "code": "0207",
+          "name": "Hong Kong Parkview Group"
+        },
+        {
+          "code": "0211",
+          "name": "Styland Holdings Ltd."
+        },
+        {
+          "code": "0213",
+          "name": "National Electronics Holdings Limited"
+        },
+        {
+          "code": "0215",
+          "name": "Hutchison Telecommunications Hong Kong Holdings"
+        },
+        {
+          "code": "0218",
+          "name": "Shenyin Wanguo (HK) Ltd"
+        },
+        {
+          "code": "0220",
+          "name": "Uni-President China Holdings Limited"
+        },
+        {
+          "code": "0221",
+          "name": "LeRoi Holdings Ltd."
+        },
+        {
+          "code": "0222",
+          "name": "Min Xin Holdings Ltd."
+        },
+        {
+          "code": "0223",
+          "name": "Kenfair International (Holdings) Ltd."
+        },
+        {
+          "code": "0224",
+          "name": "Pioneer Global Group Ltd."
+        },
+        {
+          "code": "0226",
+          "name": "Lippo Limited"
+        },
+        {
+          "code": "0227",
+          "name": "First Shanghai Investments Ltd."
+        },
+        {
+          "code": "0228",
+          "name": "China Energy Development Holdings Limited"
+        },
+        {
+          "code": "0230",
+          "name": "ONFEM Holdings Ltd."
+        },
+        {
+          "code": "0231",
+          "name": "Dynamic Global Holdings Ltd."
+        },
+        {
+          "code": "0232",
+          "name": "CATIC International Holdings Ltd"
+        },
+        {
+          "code": "0233",
+          "name": "Mingyuan Medicare Development"
+        },
+        {
+          "code": "0236",
+          "name": "San Miguel Brewery Hong Kong"
+        },
+        {
+          "code": "0237",
+          "name": "Safety Godown Co. Ltd."
+        },
+        {
+          "code": "0238",
+          "name": "Lei Shing Hong Ltd."
+        },
+        {
+          "code": "0239",
+          "name": "Pak Fa Yeow"
+        },
+        {
+          "code": "0242",
+          "name": "Shun Tak Holdings Ltd."
+        },
+        {
+          "code": "0243",
+          "name": "QPL International Holdings Ltd."
+        },
+        {
+          "code": "0244",
+          "name": "Sincere Co. Ltd."
+        },
+        {
+          "code": "0245",
+          "name": "China Seven Star Shopping Ltd."
+        },
+        {
+          "code": "0246",
+          "name": "Henderson China Holdings Ltd."
+        },
+        {
+          "code": "0247",
+          "name": "Tsim Sha Tsui Properties Limited"
+        },
+        {
+          "code": "0248",
+          "name": "HKC International Holdings Ltd."
+        },
+        {
+          "code": "0250",
+          "name": "Sino-i Technology Limited"
+        },
+        {
+          "code": "0251",
+          "name": "S E A Holdings Ltd"
+        },
+        {
+          "code": "0252",
+          "name": "Southeast Asia Properties & Finance Ltd."
+        },
+        {
+          "code": "0255",
+          "name": "Lung Kee (Bermuda) Holdings Ltd."
+        },
+        {
+          "code": "0257",
+          "name": "China Everbright International Ltd."
+        },
+        {
+          "code": "0258",
+          "name": "Tomson Group Ltd."
+        },
+        {
+          "code": "0260",
+          "name": "Sino Gas Group Ltd."
+        },
+        {
+          "code": "0261",
+          "name": "CCT Tech International Ltd."
+        },
+        {
+          "code": "0263",
+          "name": "Poly Investments Holdings Ltd."
+        },
+        {
+          "code": "0264",
+          "name": "Chanco International Group Limited"
+        },
+        {
+          "code": "0267",
+          "name": "CITIC Pacific Ltd."
+        },
+        {
+          "code": "0268",
+          "name": "Kingdee International Software Group Company Limited"
+        },
+        {
+          "code": "0269",
+          "name": "China Timber Resources Group Ltd."
+        },
+        {
+          "code": "0270",
+          "name": "Guangdong Investment"
+        },
+        {
+          "code": "0271",
+          "name": "Dan Form"
+        },
+        {
+          "code": "0272",
+          "name": "Shui On Land Limited"
+        },
+        {
+          "code": "0273",
+          "name": "Willie International Holdings Limited"
+        },
+        {
+          "code": "0274",
+          "name": "Global Green"
+        },
+        {
+          "code": "0275",
+          "name": "Hanny Holdings Ltd."
+        },
+        {
+          "code": "0276",
+          "name": "Mongolia Energy"
+        },
+        {
+          "code": "0278",
+          "name": "Wah Ha Realty Co. Ltd."
+        },
+        {
+          "code": "0279",
+          "name": "Inner Mongolia Development (Holdings) Limited"
+        },
+        {
+          "code": "0280",
+          "name": "King Fook Holdings"
+        },
+        {
+          "code": "0282",
+          "name": "Next Media"
+        },
+        {
+          "code": "0283",
+          "name": "Matsunichi Communication Holdings Limited"
+        },
+        {
+          "code": "0285",
+          "name": "BYD Electronic (International) Company Limited"
+        },
+        {
+          "code": "0286",
+          "name": "G-Prop (Holdings) Ltd."
+        },
+        {
+          "code": "0287",
+          "name": "Winfair Inv."
+        },
+        {
+          "code": "0288",
+          "name": "Berjaya Holdings (HK) Ltd."
+        },
+        {
+          "code": "0289",
+          "name": "Wing On Company International Limited"
+        },
+        {
+          "code": "0291",
+          "name": "China Resources Enterprises"
+        },
+        {
+          "code": "0293",
+          "name": "Cathay Pacific Airways Ltd."
+        },
+        {
+          "code": "0296",
+          "name": "Emperor Entertainment Hotel Limited"
+        },
+        {
+          "code": "0297",
+          "name": "Sinofert Holdings"
+        },
+        {
+          "code": "0298",
+          "name": "Chuang's China Investments Ltd."
+        },
+        {
+          "code": "0299",
+          "name": "SinoCom Software Group Limited"
+        },
+        {
+          "code": "0300",
+          "name": "Shenji Group Kunming Machine Tool"
+        },
+        {
+          "code": "0301",
+          "name": "Sun Fook Kong"
+        },
+        {
+          "code": "0302",
+          "name": "OCBC Wing Hang Bank Limited"
+        },
+        {
+          "code": "0303",
+          "name": "VTech"
+        },
+        {
+          "code": "0304",
+          "name": "Peace Mark (Holdings) Ltd."
+        },
+        {
+          "code": "0306",
+          "name": "Kwoon Chung Bus Holdings Ltd."
+        },
+        {
+          "code": "0307",
+          "name": "Tidetime Sun (Group) Ltd."
+        },
+        {
+          "code": "0308",
+          "name": "China Travel International Investment Hong Kong"
+        },
+        {
+          "code": "0309",
+          "name": "Lo's Enviro-Pro Holdings Limited"
+        },
+        {
+          "code": "0310",
+          "name": "Prosperity Investment Holdings Limited"
+        },
+        {
+          "code": "0311",
+          "name": "Luen Thai Holdings Limited"
+        },
+        {
+          "code": "0313",
+          "name": "Richly Field China Development Ltd"
+        },
+        {
+          "code": "0315",
+          "name": "Smartone Telecommunications Holdings Ltd."
+        },
+        {
+          "code": "0316",
+          "name": "Orient Overseas (International) Limited"
+        },
+        {
+          "code": "0317",
+          "name": "Guangzhou Shipyard International"
+        },
+        {
+          "code": "0318",
+          "name": "Vongroup Ltd."
+        },
+        {
+          "code": "0320",
+          "name": "Computime Group Limited"
+        },
+        {
+          "code": "0321",
+          "name": "Texwinca Holdings Ltd."
+        },
+        {
+          "code": "0322",
+          "name": "Tingyi (Cayman Islands) Holding Corporation"
+        },
+        {
+          "code": "0323",
+          "name": "Maanshan Iron and Steel"
+        },
+        {
+          "code": "0326",
+          "name": "China Star Entertainment Ltd."
+        },
+        {
+          "code": "0327",
+          "name": "Pax Global Limited"
+        },
+        {
+          "code": "0328",
+          "name": "Alco Holdings"
+        },
+        {
+          "code": "0329",
+          "name": "Ruyan Group (Holdings) Limited"
+        }
+      ]
+    },
+    "JP": {
+      "label": "Japan",
+      "venue": "JPX",
+      "ricSuffix": ".T",
+      "index": "JPX listed domestic equities",
+      "source": "Japan Exchange Group official English listed-company workbook, effective 30 Sep 2026",
+      "instruments": [
+        {
+          "code": "1301",
+          "name": "KYOKUYO CO.,LTD."
+        },
+        {
+          "code": "1332",
+          "name": "Nissui Corporation"
+        },
+        {
+          "code": "1333",
+          "name": "Umios Corporation"
+        },
+        {
+          "code": "1375",
+          "name": "YUKIGUNI FACTORY CO.,LTD."
+        },
+        {
+          "code": "1377",
+          "name": "SAKATA SEED CORPORATION"
+        },
+        {
+          "code": "1379",
+          "name": "HOKUTO CORPORATION"
+        },
+        {
+          "code": "1414",
+          "name": "SHO-BOND Holdings Co.,Ltd."
+        },
+        {
+          "code": "1417",
+          "name": "MIRAIT ONE Corporation"
+        },
+        {
+          "code": "1419",
+          "name": "Tama Home Co.,Ltd."
+        },
+        {
+          "code": "1429",
+          "name": "Nippon Aqua Co.,Ltd."
+        },
+        {
+          "code": "1433",
+          "name": "BESTERRA CO.,LTD"
+        },
+        {
+          "code": "1515",
+          "name": "Nittetsu Mining Co.,Ltd."
+        },
+        {
+          "code": "1518",
+          "name": "MITSUI MATSUSHIMA HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "1605",
+          "name": "INPEX CORPORATION"
+        },
+        {
+          "code": "1662",
+          "name": "Japan Petroleum Exploration Co.,Ltd."
+        },
+        {
+          "code": "1663",
+          "name": "K&O Energy Group Inc."
+        },
+        {
+          "code": "1719",
+          "name": "HAZAMA ANDO CORPORATION"
+        },
+        {
+          "code": "1720",
+          "name": "TOKYU CONSTRUCTION CO., LTD."
+        },
+        {
+          "code": "1721",
+          "name": "COMSYS Holdings Corporation"
+        },
+        {
+          "code": "1762",
+          "name": "TAKAMATSU CONSTRUCTION GROUP CO.,LTD."
+        },
+        {
+          "code": "1766",
+          "name": "TOKEN CORPORATION"
+        },
+        {
+          "code": "1780",
+          "name": "YAMAURA CORPORATION"
+        },
+        {
+          "code": "1786",
+          "name": "Oriental Shiraishi Corporation"
+        },
+        {
+          "code": "1801",
+          "name": "TAISEI CORPORATION"
+        },
+        {
+          "code": "1802",
+          "name": "OBAYASHI CORPORATION"
+        },
+        {
+          "code": "1803",
+          "name": "SHIMIZU CORPORATION"
+        },
+        {
+          "code": "1808",
+          "name": "HASEKO Corporation"
+        },
+        {
+          "code": "1812",
+          "name": "KAJIMA CORPORATION"
+        },
+        {
+          "code": "1813",
+          "name": "Fudo Tetra Corporation"
+        },
+        {
+          "code": "1814",
+          "name": "DAISUE CONSTRUCTION CO.,LTD."
+        },
+        {
+          "code": "1815",
+          "name": "TEKKEN CORPORATION"
+        },
+        {
+          "code": "1820",
+          "name": "Nishimatsu Construction Co.,Ltd."
+        },
+        {
+          "code": "1833",
+          "name": "OKUMURA CORPORATION"
+        },
+        {
+          "code": "1835",
+          "name": "TOTETSU KOGYO CO.,LTD."
+        },
+        {
+          "code": "1852",
+          "name": "ASANUMA CORPORATION"
+        },
+        {
+          "code": "1860",
+          "name": "TODA CORPORATION"
+        },
+        {
+          "code": "1861",
+          "name": "Kumagai Gumi Co.,Ltd."
+        },
+        {
+          "code": "1870",
+          "name": "YAHAGI CONSTRUCTION CO.,LTD."
+        },
+        {
+          "code": "1871",
+          "name": "PS Construction Co.,Ltd."
+        },
+        {
+          "code": "1873",
+          "name": "NIHON HOUSE HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "1878",
+          "name": "DAITO TRUST CONSTRUCTION CO.,LTD."
+        },
+        {
+          "code": "1879",
+          "name": "SHINNIHON CORPORATION"
+        },
+        {
+          "code": "1882",
+          "name": "TOA ROAD CORPORATION"
+        },
+        {
+          "code": "1885",
+          "name": "TOA CORPORATION"
+        },
+        {
+          "code": "1887",
+          "name": "JDC CORPORATION"
+        },
+        {
+          "code": "1888",
+          "name": "WAKACHIKU CONSTRUCTION CO.,LTD."
+        },
+        {
+          "code": "1893",
+          "name": "PENTA-OCEAN CONSTRUCTION CO.,LTD."
+        },
+        {
+          "code": "1898",
+          "name": "SEIKITOKYU KOGYO CO.,LTD."
+        },
+        {
+          "code": "1899",
+          "name": "FUKUDA CORPORATION"
+        },
+        {
+          "code": "1911",
+          "name": "Sumitomo Forestry Co.,Ltd."
+        },
+        {
+          "code": "1925",
+          "name": "DAIWA HOUSE INDUSTRY CO.,LTD."
+        },
+        {
+          "code": "1926",
+          "name": "RAITO KOGYO CO.,LTD."
+        },
+        {
+          "code": "1928",
+          "name": "Sekisui House,Ltd."
+        },
+        {
+          "code": "1929",
+          "name": "NITTOC CONSTRUCTION CO.,LTD."
+        },
+        {
+          "code": "1930",
+          "name": "HOKURIKU ELECTRICAL CONSTRUCTION CO.,LTD."
+        },
+        {
+          "code": "1934",
+          "name": "YURTEC CORPORATION"
+        },
+        {
+          "code": "1938",
+          "name": "NIPPON RIETEC CO.,LTD."
+        },
+        {
+          "code": "1939",
+          "name": "YONDENKO CORPORATION"
+        },
+        {
+          "code": "1941",
+          "name": "CHUDENKO CORPORATION"
+        },
+        {
+          "code": "1942",
+          "name": "KANDENKO CO.,LTD."
+        },
+        {
+          "code": "1944",
+          "name": "KINDEN CORPORATION"
+        },
+        {
+          "code": "1945",
+          "name": "TOKYO ENERGY & SYSTEMS INC."
+        },
+        {
+          "code": "1946",
+          "name": "TOENEC CORPORATION"
+        },
+        {
+          "code": "1950",
+          "name": "NIPPON DENSETSU KOGYO CO.,LTD."
+        },
+        {
+          "code": "1951",
+          "name": "EXEO Group,Inc."
+        },
+        {
+          "code": "1952",
+          "name": "Shin Nippon Air Technologies Co.,Ltd."
+        },
+        {
+          "code": "1959",
+          "name": "KRAFTIA CORPORATION"
+        },
+        {
+          "code": "1961",
+          "name": "SANKI ENGINEERING CO.,LTD."
+        },
+        {
+          "code": "1963",
+          "name": "JGC HOLDINGS CORPORATION"
+        },
+        {
+          "code": "1964",
+          "name": "Chugai Ro Co.,Ltd."
+        },
+        {
+          "code": "1968",
+          "name": "TAIHEI DENGYO KAISHA,LTD."
+        },
+        {
+          "code": "1969",
+          "name": "Takasago Thermal Engineering Co.,Ltd."
+        },
+        {
+          "code": "1975",
+          "name": "ASAHI KOGYOSHA CO.,LTD."
+        },
+        {
+          "code": "1976",
+          "name": "MEISEI INDUSTRIAL Co.,Ltd."
+        },
+        {
+          "code": "1979",
+          "name": "Taikisha Ltd."
+        },
+        {
+          "code": "1980",
+          "name": "DAI-DAN CO.,LTD."
+        },
+        {
+          "code": "1982",
+          "name": "Hibiya Engineering,Ltd."
+        },
+        {
+          "code": "2001",
+          "name": "NIPPN CORPORATION"
+        },
+        {
+          "code": "2002",
+          "name": "NISSHIN SEIFUN GROUP INC."
+        },
+        {
+          "code": "2004",
+          "name": "Showa Sangyo Co.,Ltd."
+        },
+        {
+          "code": "2053",
+          "name": "CHUBU SHIRYO CO.,LTD."
+        },
+        {
+          "code": "2060",
+          "name": "FEED ONE CO.,LTD."
+        },
+        {
+          "code": "2108",
+          "name": "Nippon Beet Sugar Manufacturing Co.,Ltd."
+        },
+        {
+          "code": "2109",
+          "name": "Mitsui DM Sugar Co.,Ltd."
+        },
+        {
+          "code": "2117",
+          "name": "WELLNEO SUGAR Co.,Ltd."
+        },
+        {
+          "code": "2120",
+          "name": "LIFULL Co.,Ltd."
+        },
+        {
+          "code": "2121",
+          "name": "MIXI,Inc."
+        },
+        {
+          "code": "2124",
+          "name": "JAC Recruitment Co.,Ltd."
+        },
+        {
+          "code": "2127",
+          "name": "Nihon M&A Center Holdings Inc."
+        },
+        {
+          "code": "2130",
+          "name": "Members Co.,Ltd."
+        },
+        {
+          "code": "2146",
+          "name": "UT Group Co.,Ltd."
+        },
+        {
+          "code": "2148",
+          "name": "ITmedia Inc."
+        },
+        {
+          "code": "2153",
+          "name": "E\u30fbJ Holdings Inc."
+        },
+        {
+          "code": "2154",
+          "name": "Open Up Group Inc."
+        },
+        {
+          "code": "2157",
+          "name": "KOSHIDAKA HOLDINGS Co.,LTD."
+        },
+        {
+          "code": "2163",
+          "name": "ARTNER CO.,LTD."
+        },
+        {
+          "code": "2168",
+          "name": "Pasona Group Inc."
+        },
+        {
+          "code": "2170",
+          "name": "Link and Motivation Inc."
+        },
+        {
+          "code": "2175",
+          "name": "SMS CO.,LTD."
+        },
+        {
+          "code": "2181",
+          "name": "PERSOL HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "2198",
+          "name": "IKK Holdings Inc."
+        },
+        {
+          "code": "2201",
+          "name": "Morinaga & Co.,Ltd."
+        },
+        {
+          "code": "2206",
+          "name": "Ezaki Glico Co.,Ltd."
+        },
+        {
+          "code": "2207",
+          "name": "MEITO CO.,LTD."
+        },
+        {
+          "code": "2209",
+          "name": "IMURAYA GROUP CO.,LTD."
+        },
+        {
+          "code": "2211",
+          "name": "Fujiya Co.,Ltd."
+        },
+        {
+          "code": "2212",
+          "name": "YAMAZAKI BAKING CO.,LTD."
+        },
+        {
+          "code": "2217",
+          "name": "Morozoff Limited"
+        },
+        {
+          "code": "2220",
+          "name": "KAMEDA SEIKA CO.,LTD."
+        },
+        {
+          "code": "2222",
+          "name": "Kotobuki Spirits Co.,Ltd."
+        },
+        {
+          "code": "2229",
+          "name": "CALBEE,Inc."
+        },
+        {
+          "code": "2264",
+          "name": "MORINAGA MILK INDUSTRY CO.,LTD."
+        },
+        {
+          "code": "2266",
+          "name": "ROKKO BUTTER CO.,LTD."
+        },
+        {
+          "code": "2267",
+          "name": "YAKULT HONSHA CO.,LTD."
+        },
+        {
+          "code": "2269",
+          "name": "Meiji Holdings Co.,Ltd."
+        },
+        {
+          "code": "2270",
+          "name": "MEGMILK SNOW BRAND Co.,Ltd."
+        },
+        {
+          "code": "2281",
+          "name": "Prima Meat Packers,Ltd."
+        },
+        {
+          "code": "2282",
+          "name": "NH Foods Ltd."
+        },
+        {
+          "code": "2288",
+          "name": "MARUDAI FOOD CO.,LTD."
+        },
+        {
+          "code": "2292",
+          "name": "S Foods Inc."
+        },
+        {
+          "code": "2294",
+          "name": "Kakiyasu Honten Co.,Ltd."
+        },
+        {
+          "code": "2296",
+          "name": "ITOHAM YONEKYU HOLDINGS INC."
+        },
+        {
+          "code": "2301",
+          "name": "GAKUJO CO.,Ltd."
+        },
+        {
+          "code": "2307",
+          "name": "CROSS CAT CO.,LTD."
+        },
+        {
+          "code": "2317",
+          "name": "Systena Corporation"
+        },
+        {
+          "code": "2325",
+          "name": "NJS Co.,Ltd."
+        },
+        {
+          "code": "2326",
+          "name": "Digital Arts Inc."
+        },
+        {
+          "code": "2327",
+          "name": "NS Solutions Corporation"
+        },
+        {
+          "code": "2331",
+          "name": "ALSOK CO.,LTD."
+        },
+        {
+          "code": "2335",
+          "name": "CUBE SYSTEM INC."
+        },
+        {
+          "code": "2337",
+          "name": "Ichigo Inc."
+        },
+        {
+          "code": "2353",
+          "name": "NIPPON PARKING DEVELOPMENT Co.,Ltd."
+        },
+        {
+          "code": "2359",
+          "name": "CORE CORPORATION"
+        },
+        {
+          "code": "2371",
+          "name": "Kakaku.com,Inc."
+        },
+        {
+          "code": "2378",
+          "name": "RENAISSANCE,INCORPORATED"
+        },
+        {
+          "code": "2379",
+          "name": "dip Corporation"
+        },
+        {
+          "code": "2384",
+          "name": "SBS Holdings,Inc."
+        },
+        {
+          "code": "2395",
+          "name": "SHIN NIPPON BIOMEDICAL LABORATORIES,LTD."
+        },
+        {
+          "code": "2410",
+          "name": "CAREER DESIGN CENTER CO.,LTD."
+        },
+        {
+          "code": "2413",
+          "name": "M3,Inc."
+        },
+        {
+          "code": "2429",
+          "name": "WORLD HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "2432",
+          "name": "DeNA Co.,Ltd."
+        },
+        {
+          "code": "2433",
+          "name": "HAKUHODO DY HOLDINGS INCORPORATED"
+        },
+        {
+          "code": "2461",
+          "name": "FAN Communications,Inc."
+        },
+        {
+          "code": "2462",
+          "name": "LIKE,Inc."
+        },
+        {
+          "code": "2471",
+          "name": "S-Pool,Inc."
+        },
+        {
+          "code": "2475",
+          "name": "WDB HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "2491",
+          "name": "ValueCommerce Co.,Ltd."
+        },
+        {
+          "code": "2492",
+          "name": "Infomart Corporation"
+        },
+        {
+          "code": "2501",
+          "name": "SAPPORO BREWERIES LIMITED"
+        },
+        {
+          "code": "2502",
+          "name": "Asahi Group Holdings,Ltd."
+        },
+        {
+          "code": "2503",
+          "name": "Kirin Holdings Company,Limited"
+        },
+        {
+          "code": "2531",
+          "name": "TAKARA HOLDINGS INC."
+        },
+        {
+          "code": "2533",
+          "name": "Oenon Holdings,Inc."
+        },
+        {
+          "code": "2579",
+          "name": "Coca-Cola Bottlers Japan Holdings Inc."
+        },
+        {
+          "code": "2585",
+          "name": "LIFEDRINK COMPANY,INC."
+        },
+        {
+          "code": "2587",
+          "name": "Suntory Beverage & Food Limited"
+        },
+        {
+          "code": "2590",
+          "name": "DyDo GROUP HOLDINGS,INC."
+        },
+        {
+          "code": "2593",
+          "name": "ITO EN,LTD."
+        },
+        {
+          "code": "2594",
+          "name": "KEY COFFEE INC"
+        },
+        {
+          "code": "2602",
+          "name": "The Nisshin OilliO Group,Ltd."
+        },
+        {
+          "code": "2607",
+          "name": "FUJI OIL CO.,LTD."
+        },
+        {
+          "code": "2613",
+          "name": "J-OIL MILLS, INC."
+        },
+        {
+          "code": "2659",
+          "name": "SAN-A CO.,LTD."
+        },
+        {
+          "code": "2664",
+          "name": "CAWACHI LIMITED"
+        },
+        {
+          "code": "2670",
+          "name": "ABC-MART,INC."
+        },
+        {
+          "code": "2674",
+          "name": "HARD OFF CORPORATION Co.,Ltd."
+        },
+        {
+          "code": "2676",
+          "name": "TAKACHIHO KOHEKI CO.,LTD."
+        },
+        {
+          "code": "2678",
+          "name": "ASKUL Corporation"
+        },
+        {
+          "code": "2681",
+          "name": "GEO HOLDINGS CORPORATION"
+        },
+        {
+          "code": "2685",
+          "name": "and ST HD Co.,Ltd."
+        },
+        {
+          "code": "2695",
+          "name": "Kura Sushi,Inc."
+        },
+        {
+          "code": "2726",
+          "name": "PAL GROUP Holdings CO.,LTD"
+        },
+        {
+          "code": "2730",
+          "name": "EDION Corporation"
+        },
+        {
+          "code": "2733",
+          "name": "ARATA CORPORATION"
+        },
+        {
+          "code": "2734",
+          "name": "SALA CORPORATION"
+        },
+        {
+          "code": "2737",
+          "name": "TOMEN DEVICES CORPORATION"
+        },
+        {
+          "code": "2742",
+          "name": "HALOWS CO.,LTD."
+        },
+        {
+          "code": "2749",
+          "name": "JP-HOLDINGS,INC."
+        },
+        {
+          "code": "2752",
+          "name": "FUJIO FOOD GROUP INC."
+        },
+        {
+          "code": "2753",
+          "name": "AMIYAKI TEI CO.,LTD."
+        },
+        {
+          "code": "2760",
+          "name": "TOKYO ELECTRON DEVICE LIMITED"
+        },
+        {
+          "code": "2767",
+          "name": "TSUBURAYA FIELDS HOLDINGS INC."
+        },
+        {
+          "code": "2768",
+          "name": "Sojitz Corporation"
+        },
+        {
+          "code": "2784",
+          "name": "Alfresa Holdings Corporation"
+        },
+        {
+          "code": "2791",
+          "name": "DAIKOKUTENBUSSAN CO.,LTD."
+        },
+        {
+          "code": "2792",
+          "name": "HONEYS HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "2801",
+          "name": "KIKKOMAN CORPORATION"
+        },
+        {
+          "code": "2802",
+          "name": "Ajinomoto Co.,Inc."
+        },
+        {
+          "code": "2804",
+          "name": "BULL-DOG SAUCE CO.,LTD."
+        },
+        {
+          "code": "2809",
+          "name": "Kewpie Corporation"
+        },
+        {
+          "code": "2810",
+          "name": "House Foods Group Inc."
+        },
+        {
+          "code": "2811",
+          "name": "KAGOME CO.,LTD."
+        },
+        {
+          "code": "2815",
+          "name": "ARIAKE JAPAN Co.,Ltd."
+        },
+        {
+          "code": "2871",
+          "name": "NICHIREI CORPORATION"
+        },
+        {
+          "code": "2874",
+          "name": "YOKOREI CO.,LTD."
+        },
+        {
+          "code": "2875",
+          "name": "TOYO SUISAN KAISHA,LTD."
+        },
+        {
+          "code": "2882",
+          "name": "EAT&HOLDINGS Co.,Ltd"
+        },
+        {
+          "code": "2884",
+          "name": "Yoshimura Food Holdings K.K."
+        },
+        {
+          "code": "2897",
+          "name": "NISSIN FOODS HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "2908",
+          "name": "FUJICCO CO.,LTD."
+        },
+        {
+          "code": "2910",
+          "name": "ROCK FIELD CO.,LTD."
+        },
+        {
+          "code": "2914",
+          "name": "JAPAN TOBACCO INC."
+        },
+        {
+          "code": "2915",
+          "name": "KENKO Mayonnaise Co.,Ltd."
+        },
+        {
+          "code": "2918",
+          "name": "WARABEYA NICHIYO HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "2922",
+          "name": "NATORI CO.,LTD."
+        },
+        {
+          "code": "2929",
+          "name": "Pharma Foods International Co.,Ltd."
+        },
+        {
+          "code": "2930",
+          "name": "Kitanotatsujin Corporation"
+        },
+        {
+          "code": "2931",
+          "name": "Euglena Co.,Ltd."
+        },
+        {
+          "code": "2933",
+          "name": "KIBUN FOODS INC."
+        },
+        {
+          "code": "2935",
+          "name": "PICKLES HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "2975",
+          "name": "Star Mica Holdings Co.,Ltd."
+        },
+        {
+          "code": "2980",
+          "name": "SRE Holdings Corporation"
+        },
+        {
+          "code": "2982",
+          "name": "A.D.Works Group Co.,Ltd."
+        },
+        {
+          "code": "3002",
+          "name": "GUNZE LIMITED"
+        },
+        {
+          "code": "3003",
+          "name": "Hulic Co.,Ltd."
+        },
+        {
+          "code": "3028",
+          "name": "Alpen Co.,Ltd."
+        },
+        {
+          "code": "3031",
+          "name": "RACCOON HOLDINGS,Inc."
+        },
+        {
+          "code": "3034",
+          "name": "Qol Holdings Co.,Ltd."
+        },
+        {
+          "code": "3036",
+          "name": "ALCONIX CORPORATION"
+        },
+        {
+          "code": "3038",
+          "name": "KOBE BUSSAN CO.,LTD."
+        },
+        {
+          "code": "3040",
+          "name": "SOLITON SYSTEMS K.K."
+        },
+        {
+          "code": "3046",
+          "name": "JINS HOLDINGS Inc."
+        },
+        {
+          "code": "3048",
+          "name": "BIC CAMERA INC."
+        },
+        {
+          "code": "3050",
+          "name": "DCM Holdings Co.,Ltd."
+        },
+        {
+          "code": "3064",
+          "name": "MonotaRO Co.,Ltd."
+        },
+        {
+          "code": "3076",
+          "name": "Ai Holdings Corporation"
+        },
+        {
+          "code": "3086",
+          "name": "J.FRONT RETAILING Co.,Ltd."
+        },
+        {
+          "code": "3087",
+          "name": "DOUTOR\u30fbNICHIRES Holdings Co.,Ltd."
+        },
+        {
+          "code": "3088",
+          "name": "MatsukiyoCocokara & Co."
+        },
+        {
+          "code": "3091",
+          "name": "BRONCO BILLY Co.,LTD."
+        },
+        {
+          "code": "3092",
+          "name": "ZOZO,Inc."
+        },
+        {
+          "code": "3093",
+          "name": "Treasure Factory Co.,LTD."
+        },
+        {
+          "code": "3097",
+          "name": "The Monogatari Corporation"
+        },
+        {
+          "code": "3099",
+          "name": "Isetan Mitsukoshi Holdings Ltd."
+        },
+        {
+          "code": "3101",
+          "name": "TOYOBO CO.,LTD."
+        },
+        {
+          "code": "3104",
+          "name": "Fujibo Holdings,Inc."
+        },
+        {
+          "code": "3105",
+          "name": "Nisshinbo Holdings Inc."
+        },
+        {
+          "code": "3106",
+          "name": "KURABO INDUSTRIES LTD."
+        },
+        {
+          "code": "3107",
+          "name": "Daiwabo Holdings Co.,Ltd."
+        },
+        {
+          "code": "3109",
+          "name": "SHIKIBO LTD."
+        },
+        {
+          "code": "3110",
+          "name": "NITTO BOSEKI CO.,LTD."
+        },
+        {
+          "code": "3116",
+          "name": "TOYOTA BOSHOKU CORPORATION"
+        },
+        {
+          "code": "3132",
+          "name": "MACNICA HOLDINGS,INC."
+        },
+        {
+          "code": "3139",
+          "name": "Lacto Japan Co.,Ltd."
+        },
+        {
+          "code": "3148",
+          "name": "CREATE SD HOLDINGS CO.,LTD."
+        },
+        {
+          "code": "3150",
+          "name": "grems,Inc."
+        },
+        {
+          "code": "3151",
+          "name": "VITAL KSK HOLDINGS,INC."
+        },
+        {
+          "code": "3153",
+          "name": "Yashima Denki Co.,Ltd."
+        },
+        {
+          "code": "3154",
+          "name": "MEDIUS HOLDINGS Co.,Ltd."
+        }
+      ]
+    },
+    "SG": {
+      "label": "Singapore",
+      "venue": "SGX",
+      "ricSuffix": ".SI",
+      "index": "Straits Times Index",
+      "source": "SGX verified rows plus SGX-listed code/name reference; analytics remain in src/data/tickers.json",
+      "instruments": [
+        {
+          "code": "D05",
+          "name": "DBS"
+        },
+        {
+          "code": "O39",
+          "name": "OCBC"
+        },
+        {
+          "code": "U11",
+          "name": "UOB"
+        },
+        {
+          "code": "Z74",
+          "name": "Singtel"
+        },
+        {
+          "code": "S63",
+          "name": "ST Engineering"
+        },
+        {
+          "code": "S68",
+          "name": "SGX"
+        },
+        {
+          "code": "F34",
+          "name": "Wilmar International"
+        },
+        {
+          "code": "H78",
+          "name": "Hongkong Land"
+        },
+        {
+          "code": "C6L",
+          "name": "Singapore Airlines"
+        },
+        {
+          "code": "BN4",
+          "name": "Keppel"
+        },
+        {
+          "code": "BS6",
+          "name": "Yangzijiang Shipbuilding"
+        },
+        {
+          "code": "J36",
+          "name": "Jardine Matheson"
+        },
+        {
+          "code": "C38U",
+          "name": "CapitaLand Integrated Commercial Trust"
+        },
+        {
+          "code": "A17U",
+          "name": "CapitaLand Ascendas REIT"
+        },
+        {
+          "code": "U96",
+          "name": "Sembcorp Industries"
+        },
+        {
+          "code": "5E2",
+          "name": "Seatrium"
+        },
+        {
+          "code": "AJBU",
+          "name": "Keppel DC REIT"
+        },
+        {
+          "code": "AWX",
+          "name": "AEM Holdings"
+        },
+        {
+          "code": "CC3",
+          "name": "StarHub"
+        },
+        {
+          "code": "CJLU",
+          "name": "NetLink NBN Trust"
+        },
+        {
+          "code": "D01",
+          "name": "DFI Retail Group"
+        },
+        {
+          "code": "Y92",
+          "name": "Thai Beverage"
+        },
+        {
+          "code": "G13",
+          "name": "Genting Singapore"
+        },
+        {
+          "code": "E5H",
+          "name": "Golden Agri-Resources"
+        },
+        {
+          "code": "C52",
+          "name": "ComfortDelGro"
+        },
+        {
+          "code": "S58",
+          "name": "SATS"
+        },
+        {
+          "code": "C09",
+          "name": "City Developments"
+        },
+        {
+          "code": "U14",
+          "name": "UOL Group"
+        },
+        {
+          "code": "9CI",
+          "name": "CapitaLand Investment"
+        },
+        {
+          "code": "M44U",
+          "name": "Mapletree Logistics Trust"
+        },
+        {
+          "code": "ME8U",
+          "name": "Mapletree Industrial Trust"
+        },
+        {
+          "code": "BUOU",
+          "name": "Frasers Logistics & Commercial Trust"
+        },
+        {
+          "code": "B2F",
+          "name": "Bumitama Agri"
+        },
+        {
+          "code": "C07",
+          "name": "Jardine Cycle & Carriage"
+        },
+        {
+          "code": "D03",
+          "name": "Del Monte Pacific"
+        },
+        {
+          "code": "F03",
+          "name": "Food Empire"
+        },
+        {
+          "code": "F9D",
+          "name": "Boustead Singapore"
+        },
+        {
+          "code": "F17",
+          "name": "GuocoLand"
+        },
+        {
+          "code": "H02",
+          "name": "Haw Par Corporation"
+        },
+        {
+          "code": "H15",
+          "name": "Hotel Properties"
+        },
+        {
+          "code": "I07",
+          "name": "ISDN Holdings"
+        },
+        {
+          "code": "K71U",
+          "name": "Keppel REIT"
+        },
+        {
+          "code": "MZH",
+          "name": "Nanofilm Technologies International"
+        },
+        {
+          "code": "O32",
+          "name": "Olam Group"
+        },
+        {
+          "code": "OYY",
+          "name": "PropNex Realty"
+        },
+        {
+          "code": "Q5T",
+          "name": "iFAST"
+        },
+        {
+          "code": "S08",
+          "name": "Singapore Post"
+        },
+        {
+          "code": "V03",
+          "name": "Venture Corporation"
+        },
+        {
+          "code": "Y03",
+          "name": "Yangzijiang Financial"
+        },
+        {
+          "code": "Z25",
+          "name": "Yanlord Land"
+        }
+      ]
+    },
+    "AU": {
+      "label": "Australia",
+      "venue": "ASX",
+      "ricSuffix": ".AX",
+      "index": "S&P/ASX 200",
+      "source": "ASX official ASX Listed Companies CSV, accessed 21 Oct 2026",
+      "instruments": [
+        {
+          "code": "14D",
+          "name": "1414 DEGREES LIMITED"
+        },
+        {
+          "code": "29M",
+          "name": "29METALS LIMITED"
+        },
+        {
+          "code": "T3D",
+          "name": "333D LIMITED"
+        },
+        {
+          "code": "4DX",
+          "name": "4DMEDICAL LIMITED"
+        },
+        {
+          "code": "TCF",
+          "name": "360 CAPITAL MORTGAGE REIT"
+        },
+        {
+          "code": "TOT",
+          "name": "360 CAPITAL REIT"
+        },
+        {
+          "code": "TDO",
+          "name": "3D ENERGI LIMITED"
+        },
+        {
+          "code": "3PL",
+          "name": "3P LEARNING LIMITED.."
+        },
+        {
+          "code": "49M",
+          "name": "49 METALS LIMITED"
+        },
+        {
+          "code": "88E",
+          "name": "88 ENERGY LIMITED"
+        },
+        {
+          "code": "A2M",
+          "name": "THE A2 MILK COMPANY LIMITED"
+        },
+        {
+          "code": "4DS",
+          "name": "4DS MEMORY LIMITED"
+        },
+        {
+          "code": "5GN",
+          "name": "5G NETWORKS LIMITED."
+        },
+        {
+          "code": "6KA",
+          "name": "6K ADDITIVE, INC."
+        },
+        {
+          "code": "8CO",
+          "name": "8COMMON LIMITED"
+        },
+        {
+          "code": "8IH",
+          "name": "8I HOLDINGS LTD"
+        },
+        {
+          "code": "ABG",
+          "name": "ABACUS GROUP"
+        },
+        {
+          "code": "ABX",
+          "name": "ABX GROUP LIMITED"
+        },
+        {
+          "code": "AKG",
+          "name": "ACADEMIES AUSTRALASIA GROUP LIMITED"
+        },
+        {
+          "code": "AX8",
+          "name": "ACCELERATE RESOURCES LIMITED"
+        },
+        {
+          "code": "AX1",
+          "name": "ACCENT GROUP LIMITED"
+        },
+        {
+          "code": "ACS",
+          "name": "ACCENT RESOURCES NL"
+        },
+        {
+          "code": "ADC",
+          "name": "ACDC METALS LTD"
+        },
+        {
+          "code": "ACQ",
+          "name": "ACORN CAPITAL INVESTMENT FUND LIMITED"
+        },
+        {
+          "code": "ACF",
+          "name": "ACROW LIMITED"
+        },
+        {
+          "code": "ACR",
+          "name": "ACRUX LIMITED"
+        },
+        {
+          "code": "ACT",
+          "name": "ACTCELERATE INTERNATIONAL GROUP LTD"
+        },
+        {
+          "code": "ACW",
+          "name": "ACTINOGEN MEDICAL LIMITED"
+        },
+        {
+          "code": "ATV",
+          "name": "ACTIVEPORT GROUP LTD"
+        },
+        {
+          "code": "AIV",
+          "name": "ACTIVEX LIMITED"
+        },
+        {
+          "code": "ACU",
+          "name": "ACUMENTIS GROUP LIMITED"
+        },
+        {
+          "code": "ACE",
+          "name": "ACUSENSUS LIMITED."
+        },
+        {
+          "code": "ADH",
+          "name": "ADAIRS LIMITED"
+        },
+        {
+          "code": "1AD",
+          "name": "ADALTA LIMITED"
+        },
+        {
+          "code": "ADD",
+          "name": "ADAVALE RESOURCES LIMITED"
+        },
+        {
+          "code": "AHE",
+          "name": "ADHERIS HEALTH LIMITED"
+        },
+        {
+          "code": "ADR",
+          "name": "ADHERIUM LIMITED"
+        },
+        {
+          "code": "AI1",
+          "name": "ADISYN LTD"
+        },
+        {
+          "code": "ADY",
+          "name": "ADMIRALTY RESOURCES NL."
+        },
+        {
+          "code": "AD1",
+          "name": "ADNEO LIMITED"
+        },
+        {
+          "code": "ABY",
+          "name": "ADORE BEAUTY GROUP LIMITED"
+        },
+        {
+          "code": "AHL",
+          "name": "ADRAD HOLDINGS LIMITED"
+        },
+        {
+          "code": "ADS",
+          "name": "ADSLOT LTD."
+        },
+        {
+          "code": "AVM",
+          "name": "ADVANCE METALS LIMITED"
+        },
+        {
+          "code": "ANO",
+          "name": "ADVANCE ZINCTEK LIMITED"
+        },
+        {
+          "code": "ABV",
+          "name": "ADVANCED BRAKING TECHNOLOGY LTD"
+        },
+        {
+          "code": "AEM",
+          "name": "ADVANCED ENGINEERED MATERIALS LTD"
+        },
+        {
+          "code": "AIH",
+          "name": "ADVANCED INNERGY HOLDINGS LIMITED"
+        },
+        {
+          "code": "AV1",
+          "name": "ADVERITAS LIMITED"
+        },
+        {
+          "code": "ADX",
+          "name": "ADX ENERGY LTD"
+        }
+      ]
+    }
+  }
+}

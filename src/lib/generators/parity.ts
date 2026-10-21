@@ -1,5 +1,5 @@
 /**
- * Put-call parity game (README section 1.6).
+ * Put-call parity game (Manual, Math and units).
  *
  * A faithful rebuild of the source artifact:
  *
@@ -24,7 +24,7 @@
  *     Call = (Stock - Strike) + Put + Rev/Con
  */
 import { fromCents } from '../money';
-import type { ChoiceOption, Generator, NumericQuestion, Rng, Tier } from '../types';
+import type { ChoiceOption, Generator, NumericQuestion, Rng } from '../types';
 
 /** Stock price 20 to 150, in cents. */
 const S_MIN = 2_000;
@@ -202,15 +202,15 @@ export function renderParityPrompt(d: ParityDraw, hidden: HiddenVar): string {
 }
 
 const EXPLAIN: Record<HiddenVar, string> = {
-  call: 'Rearrange parity for the call: Call = (Stock − Strike) + Put + Rev/Con.',
-  put: 'Rearrange parity for the put: Put = Call − (Stock − Strike) − Rev/Con.',
-  stock: 'Rearrange parity for spot: Stock = Strike + Call − Put − Rev/Con.',
+  call: 'Parity says a call equals intrinsic plus a put plus carry. Rearrange for the call: Call = (Stock − Strike) + Put + Rev/Con.',
+  put: 'Parity says a call equals intrinsic plus a put plus carry. Rearrange for the put by moving the other three legs across: Put = Call − (Stock − Strike) − Rev/Con.',
+  stock: 'Parity says a call equals intrinsic plus a put plus carry. Rearrange for spot: Stock = Strike + Call − Put − Rev/Con.',
   revcon:
     'Rearrange parity for the carry term: Rev/Con = Call − (Stock − Strike) − Put. A positive value is a conversion; negative is a reversal.',
 };
 
 /** The generator used inside the daily set. */
-export function generateParity(rng: Rng, tier: Tier): NumericQuestion {
+export function generateParity(rng: Rng): NumericQuestion {
   const d = drawLegal(rng);
   const hidden = rng.pick(HIDDEN);
   const answerCents = solve(hidden, d);
@@ -221,13 +221,12 @@ export function generateParity(rng: Rng, tier: Tier): NumericQuestion {
     generatorId: 'put-call-parity',
     category: 'math',
     subgroup: 'put-call-parity',
-    tier,
     prompt: `Find the missing value. Call = (Stock − Strike) + Put + Rev/Con.\n\n${renderParityPrompt(d, hidden)}`,
     context:
       'Rev/Con is the reversal/conversion carry term: the financing and dividend effect of holding the replicating position to expiry. Positive for a conversion, negative for a reversal.',
     explain: EXPLAIN[hidden],
     anchor: 'Parity says a call equals intrinsic plus a put plus carry. If one of the four legs is missing, rearrange rather than rederive.',
-    citation: 'README section 1.6; source artifact at claude.ai/public/artifacts/956f25f7-129e-4d65-b31b-3bcfd41aae35.',
+    citation: 'Manual, Math and units, put-call parity',
     signature: `parity|hidden-${hidden}`,
     answer: fromCents(answerCents),
     decimals: 2,
@@ -238,9 +237,10 @@ export function generateParity(rng: Rng, tier: Tier): NumericQuestion {
 
 /**
  * A variant that asks which rearrangement applies, to test the structure rather
- * than the arithmetic. Used at higher tiers and in the review queue.
+ * than the arithmetic. Used alongside the numeric variant so the drill tests
+ * structure as well as execution.
  */
-export function generateParityChoice(rng: Rng, tier: Tier): import('../types').ChoiceQuestion {
+export function generateParityChoice(rng: Rng): import('../types').ChoiceQuestion {
   const d = drawLegal(rng);
   const hidden = rng.pick(HIDDEN);
 
@@ -251,16 +251,45 @@ export function generateParityChoice(rng: Rng, tier: Tier): import('../types').C
     revcon: `${money(d.callCents)} − (${money(d.stockCents)} − ${money(d.strikeCents)}) − ${money(d.putCents)}`,
   };
 
-  const wrong: Record<HiddenVar, string> = {
-    call: `(${money(d.stockCents)} − ${money(d.strikeCents)}) + ${money(d.putCents)} − ${money(d.revConCents)}`,
-    put: `${money(d.callCents)} + (${money(d.stockCents)} − ${money(d.strikeCents)}) − ${money(d.revConCents)}`,
-    stock: `${money(d.strikeCents)} + ${money(d.callCents)} + ${money(d.putCents)} − ${money(d.revConCents)}`,
-    revcon: `${money(d.callCents)} − (${money(d.stockCents)} + ${money(d.strikeCents)}) − ${money(d.putCents)}`,
+  // Four distractors, each a single plausible sign or bracket error. Sampling
+  // three of them (rather than emitting one fixed wrong answer) makes the option
+  // set vary between draws, which the structure question previously did not.
+  const wrongPool: Record<HiddenVar, string[]> = {
+    call: [
+      `(${money(d.stockCents)} − ${money(d.strikeCents)}) + ${money(d.putCents)} − ${money(d.revConCents)}`,
+      `(${money(d.stockCents)} + ${money(d.strikeCents)}) + ${money(d.putCents)} + ${money(d.revConCents)}`,
+      `${money(d.callCents)} − ${money(d.putCents)} + ${money(d.revConCents)}`,
+      `(${money(d.strikeCents)} − ${money(d.stockCents)}) + ${money(d.putCents)} + ${money(d.revConCents)}`,
+    ],
+    put: [
+      `${money(d.callCents)} + (${money(d.stockCents)} − ${money(d.strikeCents)}) − ${money(d.revConCents)}`,
+      `${money(d.callCents)} − (${money(d.stockCents)} − ${money(d.strikeCents)}) + ${money(d.revConCents)}`,
+      `${money(d.callCents)} + (${money(d.stockCents)} − ${money(d.strikeCents)}) + ${money(d.revConCents)}`,
+      `(${money(d.stockCents)} − ${money(d.strikeCents)}) − ${money(d.callCents)} − ${money(d.revConCents)}`,
+    ],
+    stock: [
+      `${money(d.strikeCents)} + ${money(d.callCents)} + ${money(d.putCents)} − ${money(d.revConCents)}`,
+      `${money(d.strikeCents)} − ${money(d.callCents)} + ${money(d.putCents)} − ${money(d.revConCents)}`,
+      `${money(d.strikeCents)} + ${money(d.callCents)} − ${money(d.putCents)} + ${money(d.revConCents)}`,
+      `${money(d.callCents)} + ${money(d.putCents)} − ${money(d.revConCents)}`,
+    ],
+    revcon: [
+      `${money(d.callCents)} − (${money(d.stockCents)} + ${money(d.strikeCents)}) − ${money(d.putCents)}`,
+      `${money(d.callCents)} + (${money(d.stockCents)} − ${money(d.strikeCents)}) − ${money(d.putCents)}`,
+      `${money(d.callCents)} − (${money(d.stockCents)} − ${money(d.strikeCents)}) + ${money(d.putCents)}`,
+      `(${money(d.stockCents)} − ${money(d.strikeCents)}) + ${money(d.putCents)} − ${money(d.callCents)}`,
+    ],
   };
+
+  const wrong = rng.sample(wrongPool[hidden].filter((w) => w !== correct[hidden]), 3);
 
   const options: ChoiceOption[] = [
     { id: 'right', label: correct[hidden] },
-    { id: 'wrong', label: wrong[hidden], note: 'Check the sign on the carry term and on the intrinsic.' },
+    ...wrong.map((label, i) => ({
+      id: `w${i}`,
+      label,
+      note: 'Check the sign on the carry term and on the intrinsic.',
+    })),
   ];
 
   return {
@@ -269,12 +298,11 @@ export function generateParityChoice(rng: Rng, tier: Tier): import('../types').C
     generatorId: 'put-call-parity-structure',
     category: 'math',
     subgroup: 'put-call-parity',
-    tier,
     prompt: `Which expression solves for the ${LABELS[hidden].toLowerCase()}?`,
     context: `Call = (Stock − Strike) + Put + Rev/Con. Stock ${money(d.stockCents)}, Strike ${money(d.strikeCents)}, Call ${money(d.callCents)}, Put ${money(d.putCents)}, Rev/Con ${money(d.revConCents)}.`,
     explain: EXPLAIN[hidden],
     anchor: 'Write parity once, then rearrange by moving one term at a time rather than recalling four separate formulas.',
-    citation: 'README section 1.6.',
+    citation: 'Manual, Math and units',
     signature: `parity|rearrange-${hidden}`,
     options: rng.shuffle(options),
     answerId: 'right',
@@ -286,7 +314,6 @@ export const parityGenerators: Generator[] = [
     id: 'put-call-parity',
     category: 'math',
     subgroup: 'put-call-parity',
-    tier: 1,
     about: 'Find the missing leg of put-call parity, correct to the penny.',
     generate: generateParity,
   },
@@ -294,7 +321,6 @@ export const parityGenerators: Generator[] = [
     id: 'put-call-parity-structure',
     category: 'math',
     subgroup: 'put-call-parity',
-    tier: 2,
     about: 'Pick the correct rearrangement of parity for a given missing leg.',
     generate: generateParityChoice,
   },

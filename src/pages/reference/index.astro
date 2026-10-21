@@ -1,0 +1,336 @@
+---
+/**
+ * Cross-venue overview.
+ *
+ * The four per-venue pages each answer "what are this exchange's rules". This
+ * page answers the question a desk actually starts with: across all four, what
+ * is open when, and which one binds a given hedge.
+ *
+ * All times on this page are **SGT (UTC+8)**, with the local time shown
+ * alongside, because the desk works on one clock and the exchanges do not.
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { SESSIONS, VENUES, formatSessions, overlap, sessionMinutes, venueById } from '../../lib/sessions';
+import { url } from '../../lib/url';
+
+const venues = VENUES;
+
+// The bar chart runs from the first open to the last close, in SGT, on an
+// hourly grid.
+const DAY_START = 6 * 60;
+const DAY_END = 18 * 60;
+const ticks: string[] = [];
+for (let m = DAY_START; m <= DAY_END; m += 60) {
+  ticks.push(`${String(m / 60).padStart(2, '0')}:00`);
+}
+
+/** Left/width percentages for a session bar on the SGT axis. */
+function barStyle(open: string, close: string) {
+  const total = DAY_END - DAY_START;
+  const start = (Number(open.slice(0, 2)) * 60 + Number(open.slice(3, 5)) - DAY_START) / total;
+  const end = (Number(close.slice(0, 2)) * 60 + Number(close.slice(3, 5)) - DAY_START) / total;
+  return `left:${(start * 100).toFixed(2)}%;width:${((end - start) * 100).toFixed(2)}%`;
+}
+
+// Order by opening time in SGT: the natural reading order for a desk clock.
+const byOpen = [...venues].sort(
+  (a, b) => Number(a.continuousSgt[0].open.replace(':', '')) - Number(b.continuousSgt[0].open.replace(':', '')),
+);
+
+// Pairwise overlaps, in SGT. This is the answer to "can I adjust this hedge now".
+const pairs = [
+  ['jpx', 'sgx'],
+  ['jpx', 'hkex'],
+  ['jpx', 'asx'],
+  ['sgx', 'hkex'],
+  ['sgx', 'asx'],
+  ['hkex', 'asx'],
+] as const;
+
+/** "09:00–10:30, 11:30–12:00 and 13:00–14:30" */
+function joinWindows(windows: { start: string; end: string }[]): string {
+  const parts = windows.map((w) => `${w.start}–${w.end}`);
+  if (parts.length <= 1) return parts.join('');
+  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+function windowMinutes(windows: { start: string; end: string }[]): number {
+  return windows.reduce(
+    (total, w) =>
+      total +
+      Number(w.end.slice(0, 2)) * 60 + Number(w.end.slice(3, 5)) -
+      (Number(w.start.slice(0, 2)) * 60 + Number(w.start.slice(3, 5))),
+    0,
+  );
+}
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'Exchange overview',
+    description:
+      'All four Asian venues on one SGT clock: sessions, auctions, clearing, costs and what each one can hedge.',
+  }}
+>
+  <p>
+    The four per-venue pages describe each exchange separately. This page puts them side by side on a
+    single clock, which is how a desk actually uses them: not "what time does JPX open", but "what is
+    still open when I need to adjust this hedge".
+  </p>
+
+  <p class="tt-note">
+    <strong>Every time below is SGT (UTC+8).</strong> The desk is in Singapore, and a single clock is
+    what makes cross-venue comparison possible. Each venue's own local time is shown alongside, and
+    the offset between them stated, so the conversion never has to be guessed.
+  </p>
+
+  <h2>The clock, in SGT</h2>
+  <p class="tt-citation">
+    Continuous trading only; pre-open phases, lunch breaks and auctions are excluded. Bars are drawn
+    on the same axis, so a vertical line is the same instant everywhere.
+  </p>
+
+  <div style="overflow-x: auto">
+    <div style="min-width: 42rem">
+      {/* One grid for both the venue label column and the clock axis, so the
+          ticks line up with the bars at any width rather than depending on a
+          hardcoded margin. */}
+      {byOpen.map((venue) => (
+        <div style="display: grid; grid-template-columns: 7rem 1fr; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem">
+          <div style="white-space: nowrap; font-size: 0.9rem">
+            <a href={url(`reference/${venue.id}`)}>{venue.name}</a>
+          </div>
+          <div style="position: relative; height: 1.4rem; background: var(--sl-color-gray-6); border-radius: 0.2rem">
+            {venue.continuousSgt.map((s) => (
+              <div
+                style={`position:absolute;top:0;bottom:0;${barStyle(s.open, s.close)};background:var(--tt-accent);border-radius:0.2rem`}
+                title={`${venue.name} ${s.open}–${s.close} SGT`}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* The axis shares the same two-column grid, so the tick row starts where
+          the bars start. */}
+      <div style="display: grid; grid-template-columns: 7rem 1fr; gap: 0.5rem">
+        <div />
+        <div class="tt-citation" style="display: flex; justify-content: space-between">
+          {ticks.map((t) => (
+            <span>{t}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="tt-citation">
+    Read left to right: JPX and ASX open first at 08:00 SGT, then SGX, then HKEX. Closes run ASX
+    14:00, JPX 14:30, HKEX 16:10, SGX 17:16. Japan is first in and first out; Singapore is last out.
+  </p>
+
+  <h2>Side by side</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align: left; padding-right: 1rem">Venue</th>
+        <th style="text-align: left; padding-right: 1rem">Session, local</th>
+        <th style="text-align: left; padding-right: 1rem">Session, SGT</th>
+        <th style="text-align: left; padding-right: 1rem">Local vs SGT</th>
+        <th style="text-align: left; padding-right: 1rem">Close, SGT</th>
+        <th style="text-align: left">Hours traded</th>
+      </tr>
+    </thead>
+    <tbody>
+      {venues.map((venue) => (
+        <tr>
+          <td style="text-align: left; padding-right: 1rem; white-space: nowrap">
+            <a href={url(`reference/${venue.id}`)}>{venue.name}</a>
+          </td>
+          <td style="text-align: left; padding-right: 1rem" class="tt-mono">
+            {formatSessions(venue.continuousLocal)} {venue.timezone}
+          </td>
+          <td style="text-align: left; padding-right: 1rem" class="tt-mono">
+            {formatSessions(venue.continuousSgt)}
+          </td>
+          <td style="text-align: left; padding-right: 1rem" class="tt-mono">
+            {venue.utcOffset === 8
+              ? 'same clock'
+              : `${Math.abs(venue.utcOffset - 8)}h ahead of SGT`}
+          </td>
+          <td style="text-align: left; padding-right: 1rem" class="tt-mono">{venue.marketCloseSgt}</td>
+          <td style="text-align: left" class="tt-mono">
+            {(sessionMinutes(venue.continuousSgt) / 60).toFixed(1)} h
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <p class="tt-citation">
+    SGT is UTC+8 and has no daylight saving. JPX is SGT+1 year-round, and HKEX is SGT±0 year-round, so
+    neither needs adjusting through the year. ASX is the exception: the times above assume AEST
+    (UTC+10), and during AEDT (UTC+11) the whole session moves an hour earlier in SGT terms.
+  </p>
+
+  <h2>When can a hedge be adjusted?</h2>
+  <p>
+    Two venues are open at the same time for the durations below, in SGT. This is the practical
+    constraint on any hedge that has to be laid off in one market while being marked in another.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align: left; padding-right: 1rem">Venues</th>
+        <th style="text-align: left; padding-right: 1rem">Overlap, SGT</th>
+        <th style="text-align: left">Comment</th>
+      </tr>
+    </thead>
+    <tbody>
+      {pairs.map(([a, b]) => {
+        const va = venueById(a);
+        const vb = venueById(b);
+        if (!va || !vb) return null;
+        const windows = overlap(va, vb);
+        return (
+          <tr>
+            <td style="text-align: left; padding-right: 1rem; white-space: nowrap">
+              {va.name} / {vb.name}
+            </td>
+            <td style="text-align: left; padding-right: 1rem" class="tt-mono">
+              {windows.length === 0 ? 'none' : joinWindows(windows)}
+            </td>
+            <td style="text-align: left">
+              {windows.length === 0
+                ? 'No simultaneous session: a hedge cannot be moved between them in the same hour.'
+                : `${windowMinutes(windows)} minutes of simultaneous trading.`}
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+
+  <h2>Auctions and protected windows</h2>
+  <p>
+    Every venue protects its closing price with an auction, and each sets the close differently. The
+    windows are not interchangeable.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align: left; padding-right: 1rem">Venue</th>
+        <th style="text-align: left; padding-right: 1rem">Closing mechanism, SGT</th>
+        <th style="text-align: left; padding-right: 1rem">Random end</th>
+        <th style="text-align: left">Trade at fixed close</th>
+      </tr>
+    </thead>
+    <tbody>
+      {venues.map((venue) => (
+        <tr>
+          <td style="text-align: left; padding-right: 1rem; white-space: nowrap">{venue.name}</td>
+          <td style="text-align: left; padding-right: 1rem">
+            {venue.auctionsSgt.length > 0
+              ? venue.auctionsSgt.map((a) => `${a.time} ${a.name}`).join('; ')
+              : 'None'}
+          </td>
+          <td style="text-align: left; padding-right: 1rem">
+            {venue.preOpenSgt?.randomEnd ? 'Yes, in the pre-close phase' : 'No'}
+          </td>
+          <td style="text-align: left">
+            {venue.tradeAtCloseSgt ? `${venue.tradeAtCloseSgt} SGT` : '—'}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+
+
+  <h2>Clearing, settlement and cost</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align: left; padding-right: 1rem">Venue</th>
+        <th style="text-align: left; padding-right: 1rem">Clearing</th>
+        <th style="text-align: left; padding-right: 1rem">Settlement</th>
+        <th style="text-align: left; padding-right: 1rem">Stamp duty</th>
+        <th style="text-align: left">Cross-margin</th>
+      </tr>
+    </thead>
+    <tbody>
+      {venues.map((venue) => (
+        <tr>
+          <td style="text-align: left; padding-right: 1rem; white-space: nowrap">{venue.name}</td>
+          <td style="text-align: left; padding-right: 1rem">{venue.clearingHouse}</td>
+          <td style="text-align: left; padding-right: 1rem" class="tt-mono">{venue.settlement}</td>
+          <td style="text-align: left; padding-right: 1rem">{venue.stampDuty}</td>
+          <td style="text-align: left">
+            {venue.id === 'sgx'
+              ? 'No — CDP and SGX-DC are separate pools'
+              : venue.id === 'jpx'
+                ? 'Yes — JSCC is a single CCP'
+                : 'Within each clearing house only'}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <h2>What each market can hedge</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align: left; padding-right: 1rem">Venue</th>
+        <th style="text-align: left; padding-right: 1rem">Listed single-stock derivatives</th>
+        <th style="text-align: left; padding-right: 1rem">Offshore index listing</th>
+        <th style="text-align: left">Practical hedge leg</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align: left; padding-right: 1rem">SGX</td>
+        <td style="text-align: left; padding-right: 1rem">None</td>
+        <td style="text-align: left; padding-right: 1rem">—</td>
+        <td style="text-align: left">Index futures (A50, Nikkei, MSCI, GIFT Nifty)</td>
+      </tr>
+      <tr>
+        <td style="text-align: left; padding-right: 1rem">HKEX</td>
+        <td style="text-align: left; padding-right: 1rem">Stock options and futures exist, but vol for structured products is OTC</td>
+        <td style="text-align: left; padding-right: 1rem">—</td>
+        <td style="text-align: left">HSI and MHI futures</td>
+      </tr>
+      <tr>
+        <td style="text-align: left; padding-right: 1rem">JPX</td>
+        <td style="text-align: left; padding-right: 1rem">Yes, domestically</td>
+        <td style="text-align: left; padding-right: 1rem">Nikkei on SGX</td>
+        <td style="text-align: left">Nikkei and TOPIX futures; Nikkei also on SGX</td>
+      </tr>
+      <tr>
+        <td style="text-align: left; padding-right: 1rem">ASX</td>
+        <td style="text-align: left; padding-right: 1rem">Yes, domestically</td>
+        <td style="text-align: left; padding-right: 1rem">—</td>
+        <td style="text-align: left">SPI 200 futures</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+  <h2>Data confidence</h2>
+  <ul>
+    <li>
+      <strong>SGX, HKEX and JPX</strong> — times verified against the exchange rulebooks in
+      <span class="tt-mono">{SESSIONS.source}</span>. Both offsets are stable year-round.
+    </li>
+    <li>
+      <strong>ASX</strong> — the SGT times assume AEST. During AEDT the session is 07:00–13:00 SGT, not
+      08:00–14:00. The microstructure drill therefore excludes ASX from session-time questions.
+    </li>
+    <li>
+      <strong>Snapshot {SESSIONS.asOf}</strong>, displayed in {SESSIONS.displayTimezone}. Verify against the
+      exchange before relying on any figure here.
+    </li>
+  </ul>
+
+</StarlightPage>

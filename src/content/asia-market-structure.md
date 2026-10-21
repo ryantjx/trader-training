@@ -1,8 +1,8 @@
-# Singapore Exchange (SGX) — market structure
+# Asian market structure — SGX, HKEX, JPX
 
 The material below is a market-structure reference compiled from public sources: exchange rulebooks and product pages, published exchange research, and listed-company disclosures. Every figure carries a source link; verify against the exchange before relying on any of it.
 
-Research on Singapore Exchange (SGX), with a focus on equities and derivatives: liquidity, transaction cost, listed options, dividends and sector composition.
+It is source material for the Markets group and the market reference pages, with a focus on equities and derivatives: liquidity, transaction cost, listed options, dividends and sector composition. The SGX sections are the most developed, because SGX is the venue the microstructure drill draws on most heavily; HKEX and JPX are covered primarily by comparison.
 
 ## Resources
 

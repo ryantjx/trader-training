@@ -22,6 +22,8 @@ export interface QuestionCardProps {
   /** Locked once the answer has been submitted. */
   locked: boolean;
   onSubmit: () => void;
+  /** Choice questions are marked as soon as an option is selected. */
+  onChoiceSelect?: (optionId: string) => void;
   /** Remaining seconds, or null when untimed. */
   secondsLeft: number | null;
 }
@@ -32,6 +34,7 @@ export function QuestionCard({
   onChange,
   locked,
   onSubmit,
+  onChoiceSelect,
   secondsLeft,
 }: QuestionCardProps) {
   const hasAnswer = hasResponse(question, response);
@@ -61,7 +64,10 @@ export function QuestionCard({
           <ChoiceEntry
             options={question.options}
             selected={response.kind === 'choice' ? response.optionId : null}
-            onChange={(id) => onChange({ kind: 'choice', optionId: id })}
+            onChange={(id) => {
+              onChange({ kind: 'choice', optionId: id });
+              onChoiceSelect?.(id);
+            }}
             disabled={locked}
           />
         ) : null}
@@ -87,14 +93,16 @@ export function QuestionCard({
       </div>
 
       <div className="tt-row" style={{ marginTop: '1.25rem' }}>
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={locked || !hasAnswer}
-          style={{ padding: '0.5rem 1rem', cursor: locked || !hasAnswer ? 'not-allowed' : 'pointer' }}
-        >
-          {locked ? 'Answered' : 'Submit answer'}
-        </button>
+        {question.kind !== 'choice' ? (
+          <button
+            type="button"
+            onClick={onSubmit}
+            disabled={locked || !hasAnswer}
+            style={{ padding: '0.5rem 1rem', cursor: locked || !hasAnswer ? 'not-allowed' : 'pointer' }}
+          >
+            {locked ? 'Answered' : 'Submit answer'}
+          </button>
+        ) : null}
 
         {secondsLeft !== null && !locked ? (
           <span className="tt-timer" aria-live="off">

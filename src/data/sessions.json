@@ -1,14 +1,20 @@
 {
   "asOf": "2026-10-17",
   "displayTimezone": "SGT",
-  "source": "src/content/sgx-market-structure.md (SGX, HKEX, JPX); ASX and KRX times are encoded with an explicit DST caveat.",
+  "source": "src/content/asia-market-structure.md (SGX, HKEX, JPX); ASX times are encoded with an explicit DST caveat.",
   "venues": [
     {
       "id": "sgx",
       "name": "SGX",
       "market": "SG",
       "currency": "SGD",
+      "timezone": "SGT",
+      "utcOffset": 8,
       "continuousSgt": [
+        { "open": "09:00", "close": "12:00" },
+        { "open": "13:00", "close": "17:00" }
+      ],
+      "continuousLocal": [
         { "open": "09:00", "close": "12:00" },
         { "open": "13:00", "close": "17:00" }
       ],
@@ -24,8 +30,10 @@
       "tradeAtCloseSgt": "17:06-17:16",
       "preCloseSgt": { "start": "17:00", "randomEnd": "17:04-17:05" },
       "marketCloseSgt": "17:16",
+      "marketCloseLocal": "17:16",
       "halfDayCloseSgt": "12:16",
       "settlement": "T+2",
+      "settlementMethod": "delivery versus payment",
       "clearingHouse": "CDP (cash) + SGX-DC (derivatives)",
       "depository": "CDP",
       "scripless": true,
@@ -37,7 +45,13 @@
       "name": "HKEX",
       "market": "HK",
       "currency": "HKD",
+      "timezone": "HKT",
+      "utcOffset": 8,
       "continuousSgt": [
+        { "open": "09:30", "close": "12:00" },
+        { "open": "13:00", "close": "16:00" }
+      ],
+      "continuousLocal": [
         { "open": "09:30", "close": "12:00" },
         { "open": "13:00", "close": "16:00" }
       ],
@@ -50,8 +64,10 @@
       ],
       "tradeAtCloseSgt": null,
       "marketCloseSgt": "16:10",
+      "marketCloseLocal": "16:10",
       "halfDayCloseSgt": "12:10",
       "settlement": "T+2",
+      "settlementMethod": "delivery versus payment",
       "clearingHouse": "HKSCC (cash), HKCC (futures), SEOCH (stock options), OTC Clear (OTC)",
       "depository": "CCASS (operated by HKSCC)",
       "scripless": false,
@@ -63,9 +79,15 @@
       "name": "JPX (TSE)",
       "market": "JP",
       "currency": "JPY",
+      "timezone": "JST",
+      "utcOffset": 9,
       "continuousSgt": [
         { "open": "08:00", "close": "10:30" },
         { "open": "11:30", "close": "14:30" }
+      ],
+      "continuousLocal": [
+        { "open": "09:00", "close": "11:30" },
+        { "open": "12:30", "close": "15:30" }
       ],
       "lunchSgt": [{ "open": "10:30", "close": "11:30" }],
       "preOpenSgt": null,
@@ -74,8 +96,10 @@
       "auctionsSgt": [{ "name": "Closing auction (Itayose)", "time": "14:30" }],
       "tradeAtCloseSgt": null,
       "marketCloseSgt": "14:30",
+      "marketCloseLocal": "15:30",
       "halfDayCloseSgt": null,
       "settlement": "T+2",
+      "settlementMethod": "delivery versus payment",
       "clearingHouse": "JSCC (single CCP for cash and derivatives)",
       "depository": "JSCC via Japan Securities Settlement",
       "scripless": true,
@@ -83,32 +107,14 @@
       "dstNote": "JST equals SGT+1 year-round; SGT times shown are the TSE 09:00-11:30 and 12:30-15:30 JST sessions"
     },
     {
-      "id": "krx",
-      "name": "KRX",
-      "market": "KR",
-      "currency": "KRW",
-      "continuousSgt": [{ "open": "08:00", "close": "14:30" }],
-      "lunchSgt": [],
-      "preOpenSgt": null,
-      "midDayPreOpenSgt": null,
-      "nonCancelSgt": [],
-      "auctionsSgt": [],
-      "tradeAtCloseSgt": null,
-      "marketCloseSgt": "14:30",
-      "halfDayCloseSgt": null,
-      "settlement": "T+2",
-      "clearingHouse": "KRX CCP",
-      "depository": "KSD",
-      "scripless": true,
-      "stampDuty": "securities transaction tax applies to sales",
-      "dstNote": "KST equals SGT+1 year-round; SGT times shown are the 09:00-15:30 KST session"
-    },
-    {
       "id": "asx",
       "name": "ASX",
       "market": "AU",
       "currency": "AUD",
+      "timezone": "AEST",
+      "utcOffset": 10,
       "continuousSgt": [{ "open": "08:00", "close": "14:00" }],
+      "continuousLocal": [{ "open": "10:00", "close": "16:00" }],
       "lunchSgt": [],
       "preOpenSgt": { "start": "05:00", "end": "08:00", "randomEnd": null, "note": "Long pre-open phase from 07:00 AEST" },
       "midDayPreOpenSgt": null,
@@ -116,8 +122,10 @@
       "auctionsSgt": [{ "name": "Closing auction", "time": "14:00" }],
       "tradeAtCloseSgt": null,
       "marketCloseSgt": "14:00",
+      "marketCloseLocal": "16:00",
       "halfDayCloseSgt": "12:00",
       "settlement": "T+2",
+      "settlementMethod": "delivery versus payment",
       "clearingHouse": "ASX Clear / ASX Clear (Futures)",
       "depository": "CHESS",
       "scripless": true,

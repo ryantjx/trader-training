@@ -1,5 +1,5 @@
 /**
- * Gamma and Greek PnL drills (README section 1.1).
+ * Gamma and Greek PnL drills (Manual, Math and units).
  *
  * The unit convention is stated in every prompt, because the README's point is
  * that the difficulty of this drill is unit discipline rather than algebra.
@@ -19,7 +19,7 @@
  */
 import { round2 } from '../money';
 import { INDICES } from './indices';
-import type { Generator, Question, Rng, Tier } from '../types';
+import type { Generator, Question, Rng } from '../types';
 
 const GAMMAS = [50_000, 100_000, 150_000, 200_000, 250_000, 400_000, 500_000, 750_000] as const;
 const MOVES = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7.5, 8, 10] as const;
@@ -37,7 +37,7 @@ function deltaPnl(delta: number, movePct: number): number {
   return round2((delta * movePct) / 100);
 }
 
-function base(rng: Rng, tier: Tier) {
+function base(rng: Rng) {
   const gamma = rng.pick(GAMMAS);
   const movePct = rng.pick(MOVES);
   const index = rng.pick(INDICES);
@@ -53,8 +53,8 @@ function id(rng: Rng): string {
   return `gamma-${rng.int(0, 1_000_000).toString(36)}`;
 }
 
-function gammaOnly(rng: Rng, tier: Tier): Question {
-  const { gamma, movePct, indexName, indexLevel } = base(rng, tier);
+function gammaOnly(rng: Rng): Question {
+  const { gamma, movePct, indexName, indexLevel } = base(rng);
   const answer = gammaPnl(gamma, movePct);
 
   return {
@@ -63,12 +63,11 @@ function gammaOnly(rng: Rng, tier: Tier): Question {
     generatorId: 'gamma-pnl',
     category: 'math',
     subgroup: 'greeks',
-    tier,
     prompt: `Your book carries a gamma of ${gamma.toLocaleString('en-US')} on the ${indexName}, quoted in dollars per 1 percentage point move in the index. The index is at ${indexLevel.toLocaleString('en-US')} and moves ${movePct}%. What is the gamma PnL, in dollars?`,
     context: 'Gamma is quoted per 1 percentage point, not per 1.00 of spot.',
     explain: `Gamma PnL scales with the square of the move. The move is ${movePct}% = ${movePct} units of 1pp, so the PnL is (1/2) x ${gamma.toLocaleString('en-US')} x ${movePct}^2 / 100 = ${answer.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}. Equivalently the delta change is ${(gamma * movePct).toLocaleString('en-US')}, and the PnL is the average delta times the move.`,
     anchor: `With gamma per 1pp: PnL = (gamma / 200) x movePct^2. Here gamma/200 = ${(gamma / 200).toLocaleString('en-US')}.`,
-    citation: 'README section 1.1, worked example.',
+    citation: 'Manual, Math and units: worked example',
     signature: 'gamma-pnl|per-1pp',
     answer,
     decimals: 2,
@@ -77,8 +76,8 @@ function gammaOnly(rng: Rng, tier: Tier): Question {
   };
 }
 
-function deltaPlusGamma(rng: Rng, tier: Tier): Question {
-  const { gamma, movePct, indexName, indexLevel } = base(rng, tier);
+function deltaPlusGamma(rng: Rng): Question {
+  const { gamma, movePct, indexName, indexLevel } = base(rng);
   const delta = rng.pick(DELTAS);
   const dPnl = deltaPnl(delta, movePct);
   const gPnl = gammaPnl(gamma, movePct);
@@ -90,13 +89,12 @@ function deltaPlusGamma(rng: Rng, tier: Tier): Question {
     generatorId: 'delta-gamma-pnl',
     category: 'math',
     subgroup: 'greeks',
-    tier,
     prompt: `Your book is long ${delta.toLocaleString('en-US')} delta and ${gamma.toLocaleString('en-US')} gamma on the ${indexName}, both quoted in dollars per 1 percentage point move. The index moves ${movePct}% in your favour. What is the total PnL, in dollars?`,
     context:
       'Both Greeks are quoted per 1 percentage point move. The delta gain is linear in the move; the gamma gain is quadratic.',
     explain: `Delta PnL = ${delta.toLocaleString('en-US')} x ${movePct} / 100 = ${dPnl.toLocaleString('en-US')}. Gamma PnL = ${gamma.toLocaleString('en-US')} x ${movePct}^2 / 200 = ${gPnl.toLocaleString('en-US')}. Total = ${answer.toLocaleString('en-US')}. The gamma term is the second-order correction, and it grows quadratically, so it dominates as the move widens.`,
     anchor: 'Split PnL into the linear delta term and the quadratic gamma term, then add. Never net the Greeks first.',
-    citation: 'README section 1.1, quiz mechanics.',
+    citation: 'Manual, Math and units',
     signature: 'gamma-pnl|delta-plus-gamma',
     answer,
     decimals: 2,
@@ -105,8 +103,8 @@ function deltaPlusGamma(rng: Rng, tier: Tier): Question {
   };
 }
 
-function fullAttribution(rng: Rng, tier: Tier): Question {
-  const { gamma, movePct, indexName, indexLevel } = base(rng, tier);
+function fullAttribution(rng: Rng): Question {
+  const { gamma, movePct, indexName, indexLevel } = base(rng);
   const delta = rng.pick(DELTAS);
   const theta = rng.pick(THETAS);
   const days = rng.int(1, 5);
@@ -125,13 +123,12 @@ function fullAttribution(rng: Rng, tier: Tier): Question {
     generatorId: 'pnl-attribution',
     category: 'math',
     subgroup: 'greeks',
-    tier,
     prompt: `Overnight, the ${indexName} moved ${movePct}% and implied vol rose ${volMove} points over ${days} calendar day${days > 1 ? 's' : ''}. Your book: delta ${delta.toLocaleString('en-US')}, gamma ${gamma.toLocaleString('en-US')}, vega ${vega.toLocaleString('en-US')} per vol point, theta ${theta.toLocaleString('en-US')} per day. What is the total PnL, in dollars?`,
     context:
       'Delta and gamma are per 1 percentage point move. Vega is per vol point (1% of vol). Theta is a cost, so it enters negative.',
     explain: `Delta: +${dPnl.toLocaleString('en-US')}. Gamma: +${gPnl.toLocaleString('en-US')}. Vega (vol rose): +${vegaPnl.toLocaleString('en-US')}. Theta over ${days} day${days > 1 ? 's' : ''}: ${thetaPnl.toLocaleString('en-US')}. Total ${answer.toLocaleString('en-US')}.`,
     anchor: 'Attribution is additive only to second order. On a large move the cross terms stop being negligible and the decomposition will not reconcile.',
-    citation: 'README sections 1.1 and 1.5.',
+    citation: 'Manual, Math and units',
     signature: 'gamma-pnl|full-attribution',
     answer,
     decimals: 2,
@@ -140,7 +137,7 @@ function fullAttribution(rng: Rng, tier: Tier): Question {
   };
 }
 
-function expectedMove(rng: Rng, tier: Tier): Question {
+function expectedMove(rng: Rng): Question {
   const vol = rng.pick([10, 15, 20, 25, 30, 40, 50] as const);
   const index = rng.pick(INDICES);
   const annualMovePct = vol;
@@ -154,12 +151,11 @@ function expectedMove(rng: Rng, tier: Tier): Question {
     generatorId: 'expected-move',
     category: 'math',
     subgroup: 'greeks',
-    tier,
     prompt: `The ${index.name} is at ${index.level.toLocaleString('en-US')} and one-month implied vol is ${vol}%. Using the standard approximation, what is the one-day expected move as a percentage of spot, to the nearest 0.01%?`,
     context: 'One-day move is approximately annual vol divided by 16, because there are roughly 256 trading days in a year.',
-    explain: `One-day move = ${vol} / 16 = ${daily}%. For reference the one-week figure is ${vol} / 7 = ${weekly}%. The divisors come from the square root of time: sqrt(256) = 16 and sqrt(52) = 7.2.`,
+    explain: `One-day move = ${vol} / 16 = ${daily}%. For reference the one-week figure is ${vol} / 7 = ${weekly}%. The divisors come from the square root of time: there are 256 trading days in a year and sqrt(256) = 16 exactly; there are 52 weeks and sqrt(52) = 7.21, which the convention rounds to 7.`,
     anchor: 'Annual vol / 16 is the daily move. Annual vol / 7 is the weekly move. Memorise both divisors.',
-    citation: 'README section 1.1, back-of-envelope anchors.',
+    citation: 'Manual, Math and units, the rules of thumb',
     signature: 'expected-move|one-day',
     answer,
     decimals: 2,
@@ -168,7 +164,7 @@ function expectedMove(rng: Rng, tier: Tier): Question {
   };
 }
 
-function deltaPnlOnly(rng: Rng, tier: Tier): Question {
+function deltaPnlOnly(rng: Rng): Question {
   const delta = rng.pick(DELTAS);
   const movePct = rng.pick(MOVES);
   const answer = deltaPnl(delta, movePct);
@@ -180,12 +176,11 @@ function deltaPnlOnly(rng: Rng, tier: Tier): Question {
     generatorId: 'delta-pnl',
     category: 'math',
     subgroup: 'greeks',
-    tier,
     prompt: `You are long ${delta.toLocaleString('en-US')} delta on the ${index.name}, quoted in dollars per 1 percentage point move. The index moves ${movePct}%. What is the delta PnL, in dollars?`,
     context: 'Delta is quoted per 1 percentage point move.',
     explain: `Delta PnL = delta x movePct / 100 = ${delta.toLocaleString('en-US')} x ${movePct} / 100 = ${answer.toLocaleString('en-US')}.`,
     anchor: 'Delta per 1pp, so the answer is delta x movePct / 100. Note the divide by 100: the move is quoted in percent.',
-    citation: 'README section 1.1.',
+    citation: 'Manual, Math and units',
     signature: 'gamma-pnl|delta-only',
     answer,
     decimals: 2,
@@ -199,7 +194,6 @@ export const gammaGenerators: Generator[] = [
     id: 'gamma-pnl',
     category: 'math',
     subgroup: 'greeks',
-    tier: 1,
     about: 'Gamma PnL from a gamma quoted per 1 percentage point and a percentage move.',
     generate: gammaOnly,
   },
@@ -207,7 +201,6 @@ export const gammaGenerators: Generator[] = [
     id: 'delta-pnl',
     category: 'math',
     subgroup: 'greeks',
-    tier: 1,
     about: 'Delta PnL, to keep the unit convention of a Greek quoted "per 1pp" sharp.',
     generate: deltaPnlOnly,
   },
@@ -215,7 +208,6 @@ export const gammaGenerators: Generator[] = [
     id: 'expected-move',
     category: 'math',
     subgroup: 'greeks',
-    tier: 2,
     about: 'One-day and one-week expected move from annualised vol (vol/16 and vol/7).',
     generate: expectedMove,
   },
@@ -223,7 +215,6 @@ export const gammaGenerators: Generator[] = [
     id: 'delta-gamma-pnl',
     category: 'math',
     subgroup: 'greeks',
-    tier: 3,
     about: 'Total PnL split into the linear delta term and the quadratic gamma term.',
     generate: deltaPlusGamma,
   },
@@ -231,7 +222,6 @@ export const gammaGenerators: Generator[] = [
     id: 'pnl-attribution',
     category: 'math',
     subgroup: 'greeks',
-    tier: 4,
     about: 'Full overnight attribution across delta, gamma, vega and theta.',
     generate: fullAttribution,
   },

@@ -81,7 +81,7 @@ export type Subgroup =
 
 export const SUBGROUP_LABELS: Record<Subgroup, string> = {
   greeks: 'Greeks and PnL',
-  'put-call-parity': 'Put-call parity',
+  'put-call-parity': 'Put-Call Parity',
   'basis-points': 'Basis points and money',
   fx: 'FX',
   forwards: 'Forwards',
@@ -102,7 +102,7 @@ export const SUBGROUP_LABELS: Record<Subgroup, string> = {
  */
 export const QUIZZES: readonly { subgroup: Subgroup; category: Category; label: string }[] = [
   { subgroup: 'greeks', category: 'math', label: 'Greeks and PnL' },
-  { subgroup: 'put-call-parity', category: 'math', label: 'Put-call parity' },
+  { subgroup: 'put-call-parity', category: 'math', label: 'Put-Call Parity' },
   { subgroup: 'basis-points', category: 'math', label: 'Basis points and money' },
   { subgroup: 'fx', category: 'math', label: 'FX' },
   { subgroup: 'forwards', category: 'math', label: 'Forwards' },
@@ -133,22 +133,11 @@ export const GROUP_SLUGS: Record<Category, string> = {
 };
 
 
-/** Graduate, junior, VP, MD. Higher tiers get harder generators and less time. */
-export type Tier = 1 | 2 | 3 | 4;
-
-export const TIER_LABELS: Record<Tier, string> = {
-  1: 'Graduate',
-  2: 'Junior',
-  3: 'VP',
-  4: 'MD',
-};
-
 export interface QuestionBase {
   /** Stable within a generated set, used as a React key. */
   id: string;
   generatorId: string;
   category: Category;
-  tier: Tier;
   /**
    * Optional sub-grouping inside a category. Only the derivatives group uses it,
    * to keep listed contracts, OTC exotics and vol-surface content apart now that
@@ -243,11 +232,19 @@ export interface AnswerRecord {
   elapsedMs: number;
 }
 
-/** A generator is a pure function of an Rng and a tier. */
+/**
+ * A generator is a pure function of an Rng.
+ *
+ * There is deliberately no difficulty field. An earlier version carried a
+ * four-level tier per generator, but the assignments were inconsistent across
+ * files, no user ever selected a tier, and the real variation in difficulty
+ * comes from the parameters each generator draws. Every generator is simply
+ * available, and one that varies its parameter range does the work a tier was
+ * supposed to do.
+ */
 export interface Generator {
   id: string;
   category: Category;
-  tier: Tier;
   /** Sub-grouping inside the category, where one applies. */
   subgroup?: Subgroup;
   /**
@@ -255,5 +252,5 @@ export interface Generator {
    * generator tests before starting.
    */
   about: string;
-  generate(rng: Rng, tier: Tier): Question;
+  generate(rng: Rng): Question;
 }

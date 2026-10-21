@@ -1,0 +1,71 @@
+---
+/**
+ * The glossary, rendered from `src/lib/glossary.ts`.
+ *
+ * An Astro page rather than a markdown file on purpose: the entries are data,
+ * shared with the inline Term component and with each quiz's "terms used here"
+ * strip. Editing one source cannot leave the page disagreeing with the quizzes.
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { GLOSSARY, glossaryByArea } from '../../lib/glossary';
+import { url } from '../../lib/url';
+
+const areas = glossaryByArea();
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'Glossary',
+    description: 'Every abbreviation and convention the quizzes use, in one place.',
+  }}
+>
+  <p>
+    The drills are dense with shorthand. This page defines every term that appears in question text,
+    so a vocabulary gap does not read as a knowledge gap. {GLOSSARY.length} entries.
+  </p>
+
+  <nav aria-label="Jump to a section">
+    <ul>
+      {areas.map(({ area, entries }) => (
+        <li>
+          <a href={`#${area.toLowerCase()}`}>{area}</a>
+          <span class="tt-citation"> — {entries.length} terms</span>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  {areas.map(({ area, entries }) => (
+    <section>
+      <h2 id={area.toLowerCase()}>{area}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align: left; padding-right: 1.5rem">Term</th>
+            <th style="text-align: left; padding-right: 1.5rem">Expansion</th>
+            <th style="text-align: left">Definition</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map((entry) => (
+            <tr id={entry.id}>
+              <td style="text-align: left; padding-right: 1.5rem">
+                <strong class="tt-mono">{entry.term}</strong>
+              </td>
+              <td style="text-align: left; padding-right: 1.5rem" class="tt-citation">
+                {entry.expansion}
+              </td>
+              <td style="text-align: left">{entry.definition}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  ))}
+
+  <p class="tt-citation">
+    Where a term is a market convention rather than a definition, the entry states the convention as
+    this project assumes it. The <a href={url('manual')}>manual</a> covers the reasoning; this page is
+    only the vocabulary.
+  </p>
+</StarlightPage>

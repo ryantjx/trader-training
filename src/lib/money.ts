@@ -60,7 +60,6 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   HKD: 'HK$',
   JPY: '¥',
   AUD: 'A$',
-  KRW: '₩',
   CHF: 'CHF ',
   EUR: '€',
   GBP: '£',

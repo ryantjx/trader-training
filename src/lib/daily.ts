@@ -12,12 +12,12 @@
  *                a trading day looks like: the point is to switch between
  *                arithmetic and recall without a warm-up.
  *
- * The quota below is the README's weighting: mental math and exotics carry the
- * most weight, since the project is aimed at an exotic-options desk.
+ * The quota below is the desk weighting: mental math and exotics carry the most
+ * weight, since the project is aimed at an exotic-options desk.
  */
 import { rngFor } from './seed';
 import { availableGenerators } from './generators/registry';
-import type { Category, Question, Tier } from './types';
+import type { Category, Question } from './types';
 
 export const DAILY_SET_SIZE = 20;
 
@@ -25,9 +25,7 @@ export const DAILY_SET_SIZE = 20;
  * Quota per group. Sums to DAILY_SET_SIZE.
  *
  * Math and Asia Derivatives carry the most weight, since the project is aimed at
- * an exotic-options desk. Note that the exotic generators are tier 3-4, so a
- * tier-1 set substitutes the easier generators within the group rather than
- * dropping the questions.
+ * an exotic-options desk.
  */
 export const DAILY_QUOTA: Record<Category, number> = {
   math: 8,
@@ -37,7 +35,6 @@ export const DAILY_QUOTA: Record<Category, number> = {
 
 export interface DailySet {
   dateKey: string;
-  tier: Tier;
   questions: Question[];
   /** Generator ids in slot order, for debugging and tests. */
   slots: string[];
@@ -46,11 +43,15 @@ export interface DailySet {
 /**
  * Build the set for a date.
  *
+ * The whole generator pool is available, with no difficulty filter. Drawing is
+ * without replacement within a category, so a 20-question set uses 20 different
+ * generators wherever the pool is large enough.
+ *
  * Slot numbering is global across the whole set rather than per category, so a
  * generator that appears in more than one slot draws different parameters each
  * time.
  */
-export function buildDailySet(dateKey: string, tier: Tier = 2): DailySet {
+export function buildDailySet(dateKey: string): DailySet {
   const questions: Question[] = [];
   const slots: string[] = [];
   let slot = 0;
@@ -60,19 +61,25 @@ export function buildDailySet(dateKey: string, tier: Tier = 2): DailySet {
     const pool = availableGenerators().filter((g) => g.category === category);
     if (pool.length === 0) continue;
 
-    // Cycle the pool rather than sampling it, so a category with a small pool
-    // still fills its quota, and the choice of generator is itself deterministic.
+    // Shuffle the pool with a seed derived from the date and category, then walk
+    // it. Each generator is used at most once per category until the pool is
+    // exhausted, at which point the shuffle is repeated for the remainder.
+    let order: typeof pool = [];
+    let cursor = 0;
+
     for (let i = 0; i < quota; i++) {
-      const rng = rngFor(dateKey, `${category}:${i}`, slot);
-      // Which generator in the pool this slot uses.
-      const pickIndex = rng.int(0, pool.length - 1);
-      const generator = pool[pickIndex] as (typeof pool)[number];
+      if (cursor >= order.length) {
+        order = rngFor(dateKey, `${category}:pool`, i).shuffle(pool);
+        cursor = 0;
+      }
+      const generator = order[cursor] as (typeof pool)[number];
+      cursor++;
 
       // A second, independent rng for the generator's own parameters, so the
       // choice of generator cannot be affected by how a generator consumes its
       // randomness.
       const genRng = rngFor(dateKey, `gen:${generator.id}`, slot);
-      const question = generator.generate(genRng, tier);
+      const question = generator.generate(genRng);
 
       questions.push(question);
       slots.push(generator.id);
@@ -88,7 +95,6 @@ export function buildDailySet(dateKey: string, tier: Tier = 2): DailySet {
 
   return {
     dateKey,
-    tier,
     questions: shuffled.map((i) => questions[i] as Question),
     slots: shuffled.map((i) => slots[i] as string),
   };

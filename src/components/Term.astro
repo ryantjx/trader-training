@@ -1,0 +1,35 @@
+---
+/**
+ * Inline glossary term.
+ *
+ * Rendered as a native `<abbr>` so the expansion appears on hover with no
+ * JavaScript and no hydration — this must work in the static build and inside
+ * pages that are otherwise fully server-rendered.
+ *
+ * The link goes to the glossary entry rather than only showing the tooltip,
+ * because a tooltip cannot hold a definition. `url()` is used so the link
+ * survives the GitHub Pages base path.
+ */
+import { glossaryEntry } from '../lib/glossary';
+import { url } from '../lib/url';
+
+interface Props {
+  /** Glossary id, e.g. "ki" or "sticky-local-vol". */
+  id: string;
+  /** Optional display text, when the prose says something other than the term. */
+  label?: string;
+}
+
+const entry = glossaryEntry(Astro.props.id);
+const text = Astro.props.label ?? entry?.term ?? Astro.props.id;
+---
+
+{
+  entry ? (
+    <abbr title={entry.expansion} style="text-decoration: underline dotted; text-underline-offset: 0.2em; cursor: help">
+      <a href={`${url('manual/glossary')}#${entry.id}`}>{text}</a>
+    </abbr>
+  ) : (
+    <span>{text}</span>
+  )
+}

@@ -29,7 +29,8 @@
  */
 import tickersData from '../../data/tickers.json';
 import { normalizeTextAnswer } from '../marking';
-import type { ChoiceOption, ChoiceQuestion, Generator, Rng, TextQuestion, Tier } from '../types';
+import { roundTo } from '../money';
+import type { ChoiceOption, ChoiceQuestion, Generator, NumericQuestion, Rng, TextQuestion } from '../types';
 
 export interface TickerRecord {
   id: string;
@@ -169,7 +170,6 @@ function build(
   citation: string,
   correctLabel: string,
   wrongLabels: string[],
-  tier: Tier,
 ): ChoiceQuestion {
   const correct: ChoiceOption = { id: 'right', label: correctLabel };
   const wrong: ChoiceOption[] = wrongLabels.map((label, i) => ({ id: `w${i}`, label }));
@@ -180,7 +180,6 @@ function build(
     generatorId,
     category: 'markets',
     subgroup: 'tickers',
-    tier,
     prompt,
     context,
     explain,
@@ -220,7 +219,7 @@ function nameCitation(record: TickerRecord): string {
     : 'README section 2.2; src/data/tickers.json and src/content/sgx-market-structure.md (30 Sep 2026).';
 }
 
-function nameFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
+function nameFromTicker(rng: Rng): ChoiceQuestion {
   const target = rng.pick(RECORDS);
   const others = distractors(rng, target, () => false, 3);
   return build(
@@ -234,11 +233,10 @@ function nameFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
     nameCitation(target),
     target.name,
     others.map((o) => o.name),
-    tier,
   );
 }
 
-function nameFromTickerTyped(rng: Rng, tier: Tier): TextQuestion {
+function nameFromTickerTyped(rng: Rng): TextQuestion {
   const target = rng.pick(RECORDS);
   return {
     kind: 'text',
@@ -246,7 +244,6 @@ function nameFromTickerTyped(rng: Rng, tier: Tier): TextQuestion {
     generatorId: 'ticker-name-typed',
     category: 'markets',
     subgroup: 'tickers',
-    tier,
     prompt: `Name the company that trades as ${target.code}.`,
     context: `${venueName(target.market)}. Type the company name — the ticker will not be marked.`,
     explain: `${target.code} is ${target.name}, ${target.sector}, on ${venueName(target.market)}.`,
@@ -260,7 +257,7 @@ function nameFromTickerTyped(rng: Rng, tier: Tier): TextQuestion {
   };
 }
 
-function sectorFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
+function sectorFromTicker(rng: Rng): ChoiceQuestion {
   const target = rng.pick(RECORDS);
   // Distractors must sit in a different sector, or the question has two answers.
   const others = distractors(rng, target, (r) => r.sector === target.sector, 3);
@@ -280,11 +277,10 @@ function sectorFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
     'README section 2.2; sector taxonomy from src/data/tickers.json and src/content/sgx-market-structure.md.',
     target.sector,
     options,
-    tier,
   );
 }
 
-function capBandFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
+function capBandFromTicker(rng: Rng): ChoiceQuestion {
   const pool = withCap();
   const target = rng.pick(pool);
   const band = capBandOf(target.marketCapBn as number);
@@ -300,11 +296,10 @@ function capBandFromTicker(rng: Rng, tier: Tier): ChoiceQuestion {
     'README section 2.2; market cap as at 30 Sep 2026.',
     band.label,
     others.map((b) => b.label),
-    tier,
   );
 }
 
-function indexMembership(rng: Rng, tier: Tier): ChoiceQuestion {
+function indexMembership(rng: Rng): ChoiceQuestion {
   const target = rng.pick(stiEligible());
   const isSti = target.inSti;
   const correct = isSti ? 'Yes, it is an STI constituent' : 'No, it is outside the STI';
@@ -322,11 +317,10 @@ function indexMembership(rng: Rng, tier: Tier): ChoiceQuestion {
     'README section 2.2; membership as at Oct 2026.',
     correct,
     [wrong],
-    tier,
   );
 }
 
-function liquidityBand(rng: Rng, tier: Tier): ChoiceQuestion {
+function liquidityBand(rng: Rng): ChoiceQuestion {
   const target = rng.pick(withAdt());
   const band = adtBandOf(target.adtM as number);
   const others = ADT_BANDS.filter((b) => b.id !== band.id);
@@ -342,11 +336,10 @@ function liquidityBand(rng: Rng, tier: Tier): ChoiceQuestion {
     'README section 2.2; 3Q26 average daily turnover.',
     band.label,
     others.map((b) => b.label),
-    tier,
   );
 }
 
-function hedgeability(rng: Rng, tier: Tier): ChoiceQuestion {
+function hedgeability(rng: Rng): ChoiceQuestion {
   const target = rng.pick(hedgeablePool());
   const correct = 'Index futures only: the single-name risk stays OTC';
 
@@ -365,8 +358,34 @@ function hedgeability(rng: Rng, tier: Tier): ChoiceQuestion {
       'Listed single-stock futures on HKEX, so a delta-one hedge is available',
       'A listed single-name variance swap',
     ],
-    tier,
   );
+}
+
+function daysToLiquidate(rng: Rng): NumericQuestion {
+  const target = rng.pick(withAdt());
+  const turnover = target.adtM as number;
+  const positionM = rng.pick([10, 25, 50, 100, 250] as const);
+  const participationPct = rng.pick([10, 15, 20, 25, 30] as const);
+  const dailyCapacityM = (turnover * participationPct) / 100;
+  const answer = roundTo(positionM / dailyCapacityM, 1);
+
+  return {
+    kind: 'numeric',
+    id: `tkr-${rng.int(0, 1_000_000).toString(36)}`,
+    generatorId: 'days-to-liquidate',
+    category: 'markets',
+    subgroup: 'tickers',
+    prompt: `${target.name} (${target.code}) trades about S$${turnover}m a day. You need to unwind S$${positionM}m, taking no more than ${participationPct}% of daily turnover. How many trading days does the unwind take, to 1 decimal place?`,
+    context: 'Capacity per day = turnover x participation. Days = position / capacity.',
+    explain: `Capacity = S$${turnover}m x ${participationPct}% = S$${dailyCapacityM.toFixed(1)}m a day. S$${positionM}m / S$${dailyCapacityM.toFixed(1)}m = ${answer.toFixed(1)} days.`,
+    anchor: 'Days to unwind = position / (turnover x participation). Above a few days, the exit itself becomes a risk.',
+    citation: 'Manual, Markets and microstructure; turnover from the 30 Sep 2026 snapshot.',
+    signature: `markets|days-to-liquidate-${target.ticker}-${participationPct}`,
+    answer,
+    decimals: 1,
+    tolerance: 0.01,
+    unit: 'days',
+  };
 }
 
 export const tickerGenerators: Generator[] = [
@@ -374,7 +393,6 @@ export const tickerGenerators: Generator[] = [
     id: 'ticker-name',
     category: 'markets',
     subgroup: 'tickers',
-    tier: 1,
     about: 'Ticker to company name, multiple choice.',
     generate: nameFromTicker,
   },
@@ -382,7 +400,6 @@ export const tickerGenerators: Generator[] = [
     id: 'ticker-name-typed',
     category: 'markets',
     subgroup: 'tickers',
-    tier: 2,
     about: 'Ticker to company name, free text: name the company from the code alone.',
     generate: nameFromTickerTyped,
   },
@@ -390,7 +407,6 @@ export const tickerGenerators: Generator[] = [
     id: 'ticker-sector',
     category: 'markets',
     subgroup: 'tickers',
-    tier: 1,
     about: 'Ticker to sector.',
     generate: sectorFromTicker,
   },
@@ -398,7 +414,6 @@ export const tickerGenerators: Generator[] = [
     id: 'ticker-cap-band',
     category: 'markets',
     subgroup: 'tickers',
-    tier: 2,
     about: 'Ticker to market-cap band. SGX names only — the other venues are not verified.',
     generate: capBandFromTicker,
   },
@@ -406,7 +421,6 @@ export const tickerGenerators: Generator[] = [
     id: 'ticker-index-membership',
     category: 'markets',
     subgroup: 'tickers',
-    tier: 2,
     about: 'Whether a name is in the STI.',
     generate: indexMembership,
   },
@@ -414,7 +428,6 @@ export const tickerGenerators: Generator[] = [
     id: 'ticker-liquidity',
     category: 'markets',
     subgroup: 'tickers',
-    tier: 3,
     about: 'Ticker to average daily turnover band. SGX names only.',
     generate: liquidityBand,
   },
@@ -422,8 +435,14 @@ export const tickerGenerators: Generator[] = [
     id: 'ticker-hedgeability',
     category: 'markets',
     subgroup: 'tickers',
-    tier: 4,
     about: 'What listed hedge exists for a single-name position.',
     generate: hedgeability,
+  },
+  {
+    id: 'days-to-liquidate',
+    category: 'markets',
+    subgroup: 'tickers',
+    about: 'Days needed to unwind a position at a share of average daily turnover.',
+    generate: daysToLiquidate,
   },
 ];

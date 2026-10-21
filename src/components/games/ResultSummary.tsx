@@ -53,8 +53,8 @@ export function ResultSummary({ dateKey, score, onRestart, footnote }: ResultSum
       {footnote ? <p className="tt-anchor">{footnote}</p> : null}
 
       <p className="tt-citation">
-        The categories are ranked separately on the stats page, because recall and arithmetic are
-        different skills and a single blended number hides which one is failing.
+        The categories are reported separately, because recall and arithmetic are different skills and
+        a single blended number hides which one is failing.
       </p>
 
       <div style={{ marginTop: '1rem' }}>

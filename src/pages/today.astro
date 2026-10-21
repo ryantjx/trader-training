@@ -1,0 +1,61 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { DailyChallenge } from '../components/games/DailyChallenge';
+import { quizDateKey } from '../lib/seed';
+import { url } from '../lib/url';
+import { CATEGORIES, CATEGORY_LABELS } from '../lib/types';
+import { DAILY_QUOTA, DAILY_SET_SIZE } from '../lib/daily';
+import { DAILY_SECONDS_PER_QUESTION } from '../lib/modes';
+
+const dateKey = quizDateKey();
+---
+
+<StarlightPage
+  frontmatter={{
+    // Not "Trader Training": the site title is already that, and the title
+    // template would render "Trader Training | Trader Training".
+    title: 'Today',
+    description: `The daily set: ${DAILY_SET_SIZE} questions mixed across all three groups.`,
+  }}
+>
+  <p>
+    {DAILY_SET_SIZE} questions drawn from all three groups and interleaved rather than blocked,
+    because that is what a trading day looks like: arithmetic and recall with no warm-up. The set is
+    generated from today's date, so everyone sees the same questions today.
+  </p>
+  <p class="tt-note">
+    {DAILY_SECONDS_PER_QUESTION} seconds a question. The clock stops when you answer, so reading the
+    explanation is never counted against you. Date key <span class="tt-mono">{dateKey}</span> in
+    Singapore time; the set rolls over at midnight SGT.
+  </p>
+
+  <DailyChallenge client:load mode="drill" />
+
+  <h2>How the set is built</h2>
+  <ul>
+    <li>
+      <strong>Quota per group.</strong>{' '}
+      {CATEGORIES.map((c) => `${CATEGORY_LABELS[c]} ${DAILY_QUOTA[c]}`).join(', ')} out of{' '}
+      {DAILY_SET_SIZE}. Arithmetic and the derivatives layer each carry more than market recall,
+      because those are the two skills the desk is judged on.
+    </li>
+    <li>
+      <strong>Fixed budget.</strong> There is no mode selector, so the questions mean the same thing
+      today as they did last week.
+    </li>
+    <li>
+      <strong>Method after every answer.</strong> The correct value, the reasoning, a rule of thumb to
+      memorise and the source. A right answer reached the wrong way is still worth correcting.
+    </li>
+    <li>
+      <strong>An unanswered question is a miss.</strong> When the clock runs out the question is
+      marked rather than skipped, which is what happens on a desk too.
+    </li>
+  </ul>
+
+  <p class="tt-citation">
+    To work on one topic instead, use the quizzes in the sidebar, or read the group briefs on the{' '}
+    <a href={url('')}>About page</a>. The reasoning behind any drill is in the{' '}
+    <a href={url('manual')}>manual</a>.
+  </p>
+</StarlightPage>

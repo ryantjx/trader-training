@@ -3,7 +3,9 @@
 A static website of daily drills for an Asian exotic-options desk: mental math under mild time
 pressure, and recall of the market conventions and structures the desk trades.
 
-`README.md` is the design spec — what each game is and why. This file is the developer guide.
+`README.md` is the design index — what the site is, how it is structured, and the decisions behind it.
+The teaching material is published on the site under `src/content/docs/manual/`. This file is the
+developer guide: build, routes, tests, deployment.
 
 ## Quick start
 
@@ -13,7 +15,7 @@ npm run dev        # local dev server
 npm test           # vitest
 npm run build      # static build into dist/
 npm run preview    # serve the built site
-```
+```text
 
 Node 22 is pinned in `.nvmrc`.
 
@@ -28,7 +30,7 @@ design below.
 Twenty questions are assembled in the browser from a date key, so every visitor sees the same
 questions today and a score is comparable from one day to the next.
 
-```
+```text
 src/lib/seed.ts     quizDateKey() -> "2026-10-17"  (Singapore time)
                     dailySeed() / seedFor() -> integer seeds, via FNV-1a
 src/lib/rng.ts      mulberry32(seed) -> Rng
@@ -94,7 +96,7 @@ untouched question is never already correct.
 
 Every quiz is its own page. The route structure mirrors the sidebar exactly:
 
-```
+```text
 /                        Today — the daily set, 20 questions from all three groups
 /group/1-math            Math overview: its quizzes, plus a mixed drill
 /group/2-markets         Markets overview
@@ -104,19 +106,74 @@ Every quiz is its own page. The route structure mirrors the sidebar exactly:
 /quiz/fx /quiz/forwards /quiz/vol /quiz/basis-points
 /quiz/microstructure /quiz/tickers /quiz/market-knowledge
 /quiz/listed /quiz/exotic /quiz/vol-surface
-/reference/{sgx,hkex,jpx,krx,asx}   market-structure content
+/manual/                 the manual index
+/manual/math             units, Greeks, FX, bp, forwards, vol, parity
+/manual/markets          microstructure, tickers, calendars, access
+/manual/listed           contract specifications and offshore access
+/manual/exotics          payoffs, surface conventions, the hedge gap
+/manual/glossary         every abbreviation, rendered from src/lib/glossary.ts
+/reference/{sgx,hkex,jpx,asx}   market-structure facts plus a per-venue note
+/reference/              cross-venue overview: all four on one SGT clock
 /stats /about
 ```
 
 The numbered group slugs come from `GROUP_SLUGS` in `types.ts`, and the quiz list from
 `QUIZZES` in the same file — which is the single source of truth for the sidebar, the routes and
 the index on the homepage. Adding a quiz means adding a `Subgroup`, a `SUBGROUP_LABELS` entry, a
-`QUIZZES` row, a sidebar entry in `astro.config.mjs`, and a `getStaticPaths` row in
-`src/pages/quiz/[quiz].astro`.
+`QUIZZES` row, a `QUIZ_GUIDES` entry in `src/lib/quiz-guides.ts`, a sidebar entry in
+`astro.config.mjs`, and a `getStaticPaths` row in `src/pages/quiz/[quiz].astro`. A test asserts the
+guide exists, so forgetting one fails the build rather than rendering a blank page.
 
 **Build internal links with `url()` from `src/lib/url.ts`, never string concatenation.**
 `import.meta.env.BASE_URL` has no trailing slash, so `${base}quiz/fx` yields
 `/trader-trainingquiz/fx` — a 404 where the page still renders, which reads as a styling bug.
+Astro does **not** prefix `base` into links written in Markdown, so manual pages use relative links
+(`../../quiz/greeks`) rather than absolute ones. An absolute `/quiz/greeks` in a `.md` file
+will 404 under the project-page prefix.
+
+### The content layer
+
+Three files hold user-facing copy, and none of them are in the generators:
+
+| File | Holds | Read by |
+| --- | --- | --- |
+| `src/lib/quiz-guides.ts` | `purpose`, `whyItMatters`, `method`, `anchor`, `minutes`, `terms`, `manualPath`, per group and per quiz | the landing page, the group pages, the quiz pages, page meta descriptions |
+| `src/lib/glossary.ts` | every abbreviation, with expansion, definition and area | the glossary page, each quiz's term strip, the `Term` component |
+| `src/lib/venue-notes.ts` | the per-venue narrative for SGX, HKEX, JPX and ASX | the reference pages |
+| `src/lib/sessions.ts` | SGT formatting, offsets, overlaps, open-at-time | the reference pages and the overview |
+
+Keep the distinction: a generator's `about` is a maintainer note ("Gamma PnL from a gamma quoted
+per 1 percentage point"), while `purpose` is what a trader reads before starting. The quiz page
+shows the second to everyone and keeps the first inside a collapsed details block.
+
+### Session times and timezones
+
+`src/data/sessions.json` carries **both clocks** for every venue: `continuousSgt` /
+`marketCloseSgt`, and `continuousLocal` / `marketCloseLocal` with a `timezone` and `utcOffset`.
+Local times are the source of truth from the exchange rulebooks; SGT times are the same session on
+the desk clock. They are stored rather than derived so that a disagreement is visible, and
+`tests/content.test.ts` asserts that local plus offset equals SGT for every open, close and market
+close. Do not add a venue with only one clock.
+
+`src/lib/sessions.ts` is the only place that formats or compares them — `formatSessions()`,
+`sessionMinutes()`, `localToSgt()`, `overlap()` and `venuesOpenAt()`. The per-venue pages and the
+cross-venue overview both read from it, so the two cannot disagree about when a market is open.
+
+**Everything user-facing is in SGT (UTC+8)**, with local time shown alongside and the offset stated
+in words. The desk works on one clock; the exchanges do not.
+
+### Authoring the manual
+
+The manual lives in `src/content/docs/manual/` as Markdown, rendered by Starlight with
+`remark-math` and `rehype-katex`. Conventions:
+
+- **State the unit before the number.** Almost every drill exists to fix a convention, so the
+  convention is the content.
+- **Give a worked example** for every formula, with the arithmetic shown.
+- **End with `Practise this`** linking the relevant quizzes, using relative links.
+- **Do not cite the README.** It is a repository document; a site reader cannot open it. Cite the
+  manual section instead.
+- **Do not write a bare `$` pair** in prose — it renders as math. Use `USD 100m`, not `$100m`.
 
 ### The three groups
 
@@ -178,7 +235,9 @@ Fields that cannot be verified are omitted or flagged rather than guessed:
 
 ```bash
 npm test
-```
+```text
+
+Two suites:
 
 `tests/generators.test.ts` asserts, over hundreds of seeds per generator:
 
@@ -196,18 +255,25 @@ npm test
 - each index level is within its own order of magnitude, so a name can never be paired with another
   index's level.
 
-## Deployment
+`tests/content.test.ts` asserts the copy layer is populated and consistent:
 
-`.github/workflows/deploy.yml` runs the tests, builds, and publishes to GitHub Pages on push to
-`main`. `astro.config.mjs` sets `site` and `base` for a project page; drop `base` and change `site`
-if a custom domain is used later.
+- every declared quiz has a guide with a purpose, a why, a method and a time;
+- every declared group has a guide, and a plausible total time;
+- guide prose contains no internal generator ids and no `README` references;
+- every glossary id referenced by a quiz exists, and ids and terms are unique;
+- every venue in `sessions.json` has a narrative note, and no note refers to a removed venue;
+- every venue states its settlement method in the data rather than in the page;
+- every venue's local and SGT session times agree under its stated offset, including its market close;
+- the regional open and close ordering holds (JPX first to open and close, SGX last to close);
+- no Korean market content remains anywhere in `src/` (the research note is exempt: it is sourced
+  evidence, not published copy).
 
 ## Deployment
 
 The site is static and published to **GitHub Pages** by `.github/workflows/deploy.yml`, which runs on
 push to `main` (and on manual dispatch). The job installs with `npm ci` on the Node version from
-`.nvmrc`, **runs `npm test` before building** — so a failing generator test blocks the deploy — then
-builds and uploads `dist/` through `actions/configure-pages` and `actions/deploy-pages`.
+`.nvmrc`, **runs `npm test` before building** — so a failing generator or content test blocks the
+deploy — then builds and uploads `dist/` through `actions/configure-pages` and `actions/deploy-pages`.
 
 Two things are easy to get wrong:
 
@@ -238,5 +304,73 @@ component will break under the prefix. Use `import.meta.env.BASE_URL` for those.
 - **The ASX market page is unverified** for daylight saving, so its session-time questions are not
   asked.
 - **FX levels are illustrative.** The recall drill stays disabled until they are checked.
+- **Contract tick sizes are not encoded**, so no tick-value drill is generated.
+- **Korea is out of scope**, by decision. The KRX venue, KOSPI 200 contract, Chuseok calendar entry
+  and the Korean venue references in the exotic drills were removed. A test asserts none return.
 - **No leaderboard and no streaks**, by decision. Competition is against your own personal best.
   `ResultStore` in `storage.ts` is the single seam that a leaderboard would touch.
+
+## Generator pool
+
+This table used to live on the About page. It is maintainer material — internal ids, tier
+assignments and an operator instruction — so it belongs here rather than in front of a trader.
+Regenerate it from the registry when the pool changes; a test already asserts ids are unique and
+each generator emits its own `generatorId`.
+
+| Generator | Group | Sub-group | Tier | Tests |
+| --- | --- | --- | --- | --- |
+| `gamma-pnl` | Math | greeks | 1 | Gamma PnL from a gamma quoted per 1pp and a percentage move |
+| `delta-pnl` | Math | greeks | 1 | Delta PnL and the per-1pp unit convention |
+| `expected-move` | Math | greeks | 2 | One-day and one-week expected move |
+| `delta-gamma-pnl` | Math | greeks | 3 | PnL split into linear and quadratic terms |
+| `pnl-attribution` | Math | greeks | 4 | Full overnight attribution |
+| `put-call-parity` | Math | put-call-parity | 1 | Missing leg of parity, to the penny |
+| `put-call-parity-structure` | Math | put-call-parity | 2 | Correct rearrangement of parity |
+| `bp-to-money` | Math | basis-points | 1 | Basis points of notional to money |
+| `money-to-bp` | Math | basis-points | 2 | Money back to basis points |
+| `index-bps-to-money` | Math | basis-points | 3 | A basis-point move in an index, in money |
+| `fx-conversion` | Math | fx | 1 | Convert at a supplied rate |
+| `fx-pip-value` | Math | fx | 2 | Pip value on a notional |
+| `fx-triangulation` | Math | fx | 3 | Cross rate from two USD legs |
+| `fx-recall-level` | Math | fx | 2 | Recall a level — **disabled**, see below |
+| `forward-premium` | Math | forwards | 2 | Premium or discount direction |
+| `forward-rate` | Math | forwards | 3 | Forward rate from spot and rates |
+| `forward-roll-cost` | Math | forwards | 4 | Cost of rolling a hedge |
+| `vega-pnl` | Math | vol | 1 | Vega PnL per vol point |
+| `price-move-to-vol` | Math | vol | 2 | A price move in vol points |
+| `delta-strike` | Math | vol | 3 | Strike from delta |
+| `breakeven-vol` | Math | vol | 4 | Breakeven vol from gamma and theta |
+| `ticker-name` | Markets | tickers | 1 | Ticker to company name |
+| `ticker-sector` | Markets | tickers | 1 | Ticker to sector |
+| `ticker-cap-band` | Markets | tickers | 2 | Ticker to market-cap band |
+| `ticker-index-membership` | Markets | tickers | 2 | STI membership |
+| `ticker-liquidity` | Markets | tickers | 3 | Ticker to turnover band |
+| `ticker-hedgeability` | Markets | tickers | 4 | What listed hedge exists |
+| `session-open-at-time` | Markets | microstructure | 1 | Is a venue open at an SGT time |
+| `stamp-duty` | Markets | microstructure | 2 | Stamp-duty position per market |
+| `clearing-house` | Markets | microstructure | 2 | Which body clears each market |
+| `sgx-closing-routine` | Markets | microstructure | 3 | Order the SGX closing phases |
+| `calendar-event` | Markets | market-knowledge | 1 | Which holiday closes which market |
+| `access-channel` | Markets | market-knowledge | 2 | Stock Connect, QFII, H/A basis |
+| `central-bank` | Markets | market-knowledge | 2 | Policy instruments by central bank |
+| `index-construction` | Markets | market-knowledge | 2 | Index construction and membership |
+| `contract-point-value` | Asia Derivatives | listed | 1 | Point value in money |
+| `contract-notional` | Asia Derivatives | listed | 2 | Notional at a given level |
+| `contract-expiry` | Asia Derivatives | listed | 2 | Expiry convention |
+| `contract-cross-listed` | Asia Derivatives | listed | 3 | Which venues list which contract |
+| `exotic-identify` | Asia Derivatives | exotic | 2 | Identify the structure |
+| `exotic-greeks` | Asia Derivatives | exotic | 3 | Implied Greeks position |
+| `exotic-hedgeability` | Asia Derivatives | exotic | 3 | What can be hedged where |
+| `exotic-convention` | Asia Derivatives | exotic | 3 | Averaging, fixing, delta conventions |
+| `exotic-where-sold` | Asia Derivatives | exotic | 2 | Product map by market |
+| `exotic-stickiness` | Asia Derivatives | exotic | 4 | Stickiness convention and ATM vol |
+| `forward-vol` | Asia Derivatives | exotic | 3 | Forward vol from spot vols |
+| `vol-basis-pnl` | Asia Derivatives | exotic | 4 | Cross-market vol basis, in money |
+| `vol-surface-recall` | Asia Derivatives | vol-surface | 3 | Surface shape, skew, term structure |
+
+### Disabled generators
+
+`fx-recall-level` is disabled while `src/data/fx.json` has `verified: false`, because the levels in
+that snapshot are illustrative rather than checked against a source. Recall questions against an
+unverified level would be unfair. Set `verified` to `true` only after every level in the file has
+been checked; `registry.ts` marks the generator unavailable and the pool otherwise omits it.

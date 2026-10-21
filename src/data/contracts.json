@@ -74,20 +74,6 @@
       "expiryRuleShort": "second Friday (SQ)"
     },
     {
-      "id": "kospi200",
-      "name": "KOSPI 200 futures",
-      "market": "KR",
-      "exchange": "KRX",
-      "underlying": "KOSPI 200",
-      "currency": "KRW",
-      "multiplierPerPoint": 250000,
-      "multiplierNote": "KRW 250,000 per index point",
-      "miniMultiplierPerPoint": null,
-      "tickPoints": null,
-      "expiryRule": "Second Thursday of the contract month",
-      "expiryRuleShort": "second Thursday"
-    },
-    {
       "id": "a50",
       "name": "FTSE China A50 futures",
       "market": "SG",

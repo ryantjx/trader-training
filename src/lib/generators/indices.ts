@@ -9,9 +9,7 @@
  * These are approximate working levels for arithmetic drills, not market data.
  * They are deliberately round-ish so the mental math is not swamped by the
  * level itself, and their only requirement is to be the right order of magnitude
- * for the index named. The KOSPI 200 level is the futures underlying (a few
- * hundred), not the KOSPI composite (a few thousand); conflating the two is a
- * common and consequential error when sizing a hedge.
+ * for the index named.
  */
 export interface IndexRef {
   name: string;
@@ -25,7 +23,6 @@ export const INDICES: readonly IndexRef[] = [
   { name: 'HSI', level: 24_000, minLevel: 10_000, maxLevel: 40_000 },
   { name: 'Nikkei 225', level: 39_000, minLevel: 15_000, maxLevel: 60_000 },
   { name: 'TOPIX', level: 2_750, minLevel: 1_000, maxLevel: 5_000 },
-  { name: 'KOSPI 200', level: 360, minLevel: 150, maxLevel: 800 },
   { name: 'FTSE China A50', level: 14_500, minLevel: 8_000, maxLevel: 25_000 },
   { name: 'ASX 200', level: 8_400, minLevel: 5_000, maxLevel: 12_000 },
   { name: 'STI', level: 5_800, minLevel: 2_500, maxLevel: 8_000 },

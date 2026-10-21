@@ -1,5 +1,5 @@
 /**
- * Index-futures specifications (README section 3), driven by contracts.json.
+ * Index-futures specifications (Manual, Listed derivatives), driven by contracts.json.
  *
  * Tick size is deliberately absent from the data, because the project's table
  * gives multipliers and expiry conventions but not ticks. Rather than invent
@@ -8,7 +8,7 @@
  */
 import contractsData from '../../data/contracts.json';
 import { roundTo } from '../money';
-import type { ChoiceOption, ChoiceQuestion, Generator, NumericQuestion, Rng, Tier } from '../types';
+import type { ChoiceOption, ChoiceQuestion, Generator, NumericQuestion, Rng } from '../types';
 
 interface Contract {
   id: string;
@@ -27,7 +27,7 @@ interface Contract {
 
 const CONTRACTS = contractsData.contracts as Contract[];
 
-function pointValue(rng: Rng, tier: Tier): NumericQuestion {
+function pointValue(rng: Rng): NumericQuestion {
   const c = rng.pick(CONTRACTS);
   const points = rng.pick([1, 10, 25, 50, 100, 250] as const);
   const lots = rng.pick([1, 2, 5, 10, 20] as const);
@@ -39,12 +39,11 @@ function pointValue(rng: Rng, tier: Tier): NumericQuestion {
     generatorId: 'contract-point-value',
     category: 'derivatives',
     subgroup: 'listed',
-    tier,
     prompt: `${c.name} has a multiplier of ${c.multiplierPerPoint.toLocaleString('en-US')} ${c.currency} per index point. What is the PnL on ${lots} lot${lots > 1 ? 's' : ''} from a ${points}-point move, in ${c.currency}?`,
     context: `Quoted and cleared on ${c.exchange}.`,
     explain: `Money = points x multiplier x lots = ${points} x ${c.multiplierPerPoint.toLocaleString('en-US')} x ${lots} = ${answer.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${c.currency}.`,
     anchor: 'The point value is the whole specification. Know it for the contract you hedge with, because notional scales linearly with it and tick arithmetic is impossible without it.',
-    citation: 'README section 3, index futures specification table.',
+    citation: 'Manual, Listed derivatives: index futures specification table',
     signature: `derivatives|point-value-${c.id}`,
     answer,
     decimals: 2,
@@ -53,17 +52,16 @@ function pointValue(rng: Rng, tier: Tier): NumericQuestion {
   };
 }
 
-function notionalValue(rng: Rng, tier: Tier): NumericQuestion {
+function notionalValue(rng: Rng): NumericQuestion {
   const c = rng.pick(CONTRACTS);
   const levels: Record<string, number[]> = {
-    hsi: [22_000, 24_000, 26_000],
-    mhi: [22_000, 24_000, 26_000],
-    'nikkei-ose': [35_000, 39_000, 42_000],
-    'nikkei-sgx': [35_000, 39_000, 42_000],
-    topix: [2_500, 2_750, 3_000],
-    kospi200: [330, 360, 400],
-    a50: [12_500, 14_500, 16_000],
-    spi200: [7_800, 8_400, 9_000],
+    hsi: [20_000, 22_000, 24_000, 26_000, 28_000],
+    mhi: [20_000, 22_000, 24_000, 26_000, 28_000],
+    'nikkei-ose': [33_000, 35_000, 39_000, 42_000, 45_000],
+    'nikkei-sgx': [33_000, 35_000, 39_000, 42_000, 45_000],
+    topix: [2_200, 2_500, 2_750, 3_000, 3_300],
+    a50: [11_000, 12_500, 14_500, 16_000, 18_000],
+    spi200: [7_200, 7_800, 8_400, 9_000, 9_600],
   };
   const level = rng.pick(levels[c.id] ?? [10_000]);
   const answer = roundTo(level * c.multiplierPerPoint, 2);
@@ -74,12 +72,11 @@ function notionalValue(rng: Rng, tier: Tier): NumericQuestion {
     generatorId: 'contract-notional',
     category: 'derivatives',
     subgroup: 'listed',
-    tier,
     prompt: `The ${c.underlying} is at ${level.toLocaleString('en-US')}. What is the notional of one ${c.name} contract, in ${c.currency} to 2 decimal places?`,
     context: `Multiplier ${c.multiplierPerPoint.toLocaleString('en-US')} ${c.currency} per index point.`,
     explain: `Notional = level x multiplier = ${level.toLocaleString('en-US')} x ${c.multiplierPerPoint.toLocaleString('en-US')} = ${answer.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${c.currency}.`,
     anchor: 'Notional is level times point value. This is the number that decides how many lots to trade to hedge a given delta.',
-    citation: 'README section 3.',
+    citation: 'Manual, Listed derivatives',
     signature: `derivatives|notional-${c.id}`,
     answer,
     decimals: 2,
@@ -88,17 +85,26 @@ function notionalValue(rng: Rng, tier: Tier): NumericQuestion {
   };
 }
 
-function expiryConvention(rng: Rng, tier: Tier): ChoiceQuestion {
+function expiryConvention(rng: Rng): ChoiceQuestion {
   const c = rng.pick(CONTRACTS);
   const others = Array.from(
     new Set(CONTRACTS.filter((o) => o.expiryRuleShort !== c.expiryRuleShort).map((o) => o.expiryRuleShort)),
   );
   const wrong = rng.sample(others, 3);
 
+  // Alternate between two angles on the same fact: which rule applies, and what
+  // that rule means for a hedge that has to be rolled.
+  const angle = rng.pick(['rule', 'roll'] as const);
+
   const options: ChoiceOption[] = [
     { id: 'right', label: c.expiryRuleShort },
     ...wrong.map((w, i) => ({ id: `w${i}`, label: w })),
   ];
+
+  const prompt =
+    angle === 'rule'
+      ? `When does ${c.name} expire?`
+      : `You are long ${c.name}. How is the contract's expiry date determined?`;
 
   return {
     kind: 'choice',
@@ -106,19 +112,18 @@ function expiryConvention(rng: Rng, tier: Tier): ChoiceQuestion {
     generatorId: 'contract-expiry',
     category: 'derivatives',
     subgroup: 'listed',
-    tier,
-    prompt: `When does ${c.name} expire?`,
+    prompt,
     context: `Traded on ${c.exchange}.`,
-    explain: `${c.name}: ${c.expiryRule}.`,
-    anchor: 'Japan settles on the second Friday (SQ). Korea on the second Thursday. Australia on the third Thursday. Hong Kong avoids the last business day of the month, settling the day before. A50 is the last business day.',
-    citation: 'README section 3.',
-    signature: `derivatives|expiry-${c.id}`,
+    explain: `${c.name}: ${c.expiryRule}. The roll date matters because a hedge is only a hedge if it is rolled before it settles.`,
+    anchor: 'Japan settles on the second Friday (SQ). Australia on the third Thursday. Hong Kong avoids the last business day of the month, settling the day before. A50 is the last business day.',
+    citation: 'Manual, Listed derivatives',
+    signature: `derivatives|expiry-${angle}-${c.id}`,
     options: rng.shuffle(options),
     answerId: 'right',
   };
 }
 
-function crossListed(rng: Rng, tier: Tier): ChoiceQuestion {
+function crossListed(rng: Rng): ChoiceQuestion {
   const pairs = [
     {
       underlying: 'Nikkei 225',
@@ -142,16 +147,51 @@ function crossListed(rng: Rng, tier: Tier): ChoiceQuestion {
         'The MSCI suite trades on SGX. Note that the MSCI Singapore index options are effectively zero volume, so the futures are the usable leg.',
     },
     {
-      underlying: 'KOSPI 200',
-      correct: 'KRX only',
-      prompt: 'Where do KOSPI 200 futures trade?',
+      underlying: 'TOPIX',
+      correct: 'OSE only',
+      prompt: 'Where do TOPIX futures trade?',
       explain:
-        'KOSPI 200 futures trade on KRX. There is no offshore listing, so the hedge is only available while the Korean market is open.',
+        'TOPIX futures trade on OSE in Japan. Unlike the Nikkei 225, TOPIX has no SGX listing, so the hedge is only available while the Tokyo session is open and cannot be adjusted through the Asian afternoon.',
+    },
+    {
+      underlying: 'HSI',
+      correct: 'HKFE only',
+      prompt: 'Where do HSI futures trade?',
+      explain:
+        'HSI futures trade on HKFE in Hong Kong, with no offshore listing. The practical consequence is that an HSI hedge can only be adjusted during Hong Kong hours, so an overnight gap cannot be worked until the session opens.',
+    },
+    {
+      underlying: 'MHI (Mini-HSI)',
+      correct: 'HKFE only',
+      prompt: 'Where do MHI futures trade?',
+      explain:
+        'The mini-HSI trades on HKFE alongside the full contract, at one fifth the point value. There is no offshore listing, so both sizes are confined to Hong Kong hours.',
+    },
+    {
+      underlying: 'ASX SPI 200',
+      correct: 'ASX 24 only',
+      prompt: 'Where do SPI 200 futures trade?',
+      explain:
+        'SPI 200 futures trade on ASX 24. There is no offshore listing, and the session times shift in SGT terms when Australian daylight saving changes, so a hedge rolled on a fixed SGT clock is mistimed for part of the year.',
+    },
+    {
+      underlying: 'MSCI China',
+      correct: 'SGX only',
+      prompt: 'Where do MSCI China futures trade?',
+      explain:
+        'The MSCI suite trades on SGX. Note that MSCI China index options have effectively zero volume, so for that complex the futures are the only usable leg.',
+    },
+    {
+      underlying: 'GIFT Nifty',
+      correct: 'SGX only',
+      prompt: 'Where does the GIFT Nifty contract trade?',
+      explain:
+        'The GIFT Nifty is the NSE IFSC contract, made available on SGX. It is the offshore India proxy and trades outside Indian hours, which is what makes it the practical India hedge for a Singapore desk.',
     },
   ] as const;
 
   const item = rng.pick(pairs);
-  const allVenues = ['SGX only', 'OSE and SGX', 'KRX only', 'HKFE only', 'SGX and HKFE'];
+  const allVenues = ['SGX only', 'OSE and SGX', 'OSE only', 'HKFE only', 'ASX 24 only', 'SGX and HKFE'];
   const wrong = allVenues.filter((v) => v !== item.correct).slice(0, 3);
 
   return {
@@ -160,12 +200,11 @@ function crossListed(rng: Rng, tier: Tier): ChoiceQuestion {
     generatorId: 'contract-cross-listed',
     category: 'derivatives',
     subgroup: 'listed',
-    tier,
     prompt: item.prompt,
     context: 'Offshore access matters for a desk that has to hedge when the home market is shut.',
     explain: item.explain,
-    anchor: 'Japan and India have offshore listings (SGX); Korea and onshore China do not. Offshore access is what makes a hedge tradeable outside home hours.',
-    citation: 'README section 3; src/content/sgx-market-structure.md, derivatives suite.',
+    anchor: 'Japan and India have offshore listings (SGX); onshore China, Hong Kong and Australia do not. Offshore access is what makes a hedge tradeable outside home hours.',
+    citation: 'Manual, Listed derivatives; src/content/asia-market-structure.md, derivatives suite.',
     signature: `derivatives|cross-listed-${item.underlying.replace(/\s+/g, '-').toLowerCase()}`,
     options: rng.shuffle([
       { id: 'right', label: item.correct },
@@ -180,7 +219,6 @@ export const contractGenerators: Generator[] = [
     id: 'contract-point-value',
     category: 'derivatives',
     subgroup: 'listed',
-    tier: 1,
     about: 'Point value of an index futures contract, in money.',
     generate: pointValue,
   },
@@ -188,7 +226,6 @@ export const contractGenerators: Generator[] = [
     id: 'contract-notional',
     category: 'derivatives',
     subgroup: 'listed',
-    tier: 2,
     about: 'Notional of one index futures contract at a given level.',
     generate: notionalValue,
   },
@@ -196,7 +233,6 @@ export const contractGenerators: Generator[] = [
     id: 'contract-expiry',
     category: 'derivatives',
     subgroup: 'listed',
-    tier: 2,
     about: 'Expiry convention per index futures contract.',
     generate: expiryConvention,
   },
@@ -204,7 +240,6 @@ export const contractGenerators: Generator[] = [
     id: 'contract-cross-listed',
     category: 'derivatives',
     subgroup: 'listed',
-    tier: 3,
     about: 'Which venues list the major Asian index contracts.',
     generate: crossListed,
   },

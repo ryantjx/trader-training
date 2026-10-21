@@ -1,5 +1,5 @@
 /**
- * Vega, vol-to-price and strike from delta (README section 1.5).
+ * Vega, vol-to-price and strike from delta (Manual, Math and units).
  *
  * This is the arithmetic an exotic desk actually uses, and the README argues it
  * is asked at interview far more often than gamma PnL.
@@ -16,7 +16,7 @@
  */
 import { roundTo } from '../money';
 import { INDICES } from './indices';
-import type { Generator, NumericQuestion, Rng, Tier } from '../types';
+import type { Generator, NumericQuestion, Rng } from '../types';
 
 const VOLS = [10, 12, 15, 18, 20, 22, 25, 30, 35, 40] as const;
 const TENORS = [
@@ -74,7 +74,7 @@ export function strikeFromDelta(
   return isPut ? spot * Math.exp(-exponent) : spot * Math.exp(exponent);
 }
 
-function vegaPnl(rng: Rng, tier: Tier): NumericQuestion {
+function vegaPnl(rng: Rng): NumericQuestion {
   const vega = rng.pick(VEGAS);
   const volMove = rng.pick(VOL_MOVES);
   const answer = roundTo(vega * volMove, 2);
@@ -85,12 +85,11 @@ function vegaPnl(rng: Rng, tier: Tier): NumericQuestion {
     generatorId: 'vega-pnl',
     category: 'math',
     subgroup: 'vol',
-    tier,
     prompt: `Your vega is ${vega.toLocaleString('en-US')} per vol point. Implied vol rises ${volMove} points. What is the vega PnL, in dollars?`,
     context: 'Vega is quoted per vol point, meaning per 1% absolute change in vol, not per 1% of vol.',
     explain: `Vega PnL = vega x volts moved = ${vega.toLocaleString('en-US')} x ${volMove} = ${answer.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}.`,
     anchor: 'Vega per vol point and vega per 1.00 of vol differ by a factor of 100. Establish which before quoting anything.',
-    citation: 'README section 1.5.',
+    citation: 'Manual, Math and units',
     signature: 'vega|pnl',
     answer,
     decimals: 2,
@@ -99,10 +98,10 @@ function vegaPnl(rng: Rng, tier: Tier): NumericQuestion {
   };
 }
 
-function priceMoveToVolPoints(rng: Rng, tier: Tier): NumericQuestion {
+function priceMoveToVolPoints(rng: Rng): NumericQuestion {
   const vol = rng.pick(VOLS);
   const move = rng.pick([0.5, 1, 1.5, 2, 3, 4] as const);
-  const answer = roundTo((move / vol) * 100 / 100, 4);
+  const answer = roundTo(move / vol, 2);
 
   return {
     kind: 'numeric',
@@ -110,20 +109,19 @@ function priceMoveToVolPoints(rng: Rng, tier: Tier): NumericQuestion {
     generatorId: 'price-move-to-vol',
     category: 'math',
     subgroup: 'vol',
-    tier,
-    prompt: `The index moves ${move}% in a day and annualised implied vol is ${vol}%. Express that move in vol points, to 4 decimal places.`,
+    prompt: `The index moves ${move}% in a day and annualised implied vol is ${vol}%. Express that move in vol points, to 2 decimal places.`,
     context: 'A move of x% at k% annualised vol is worth approximately x / k vol points.',
-    explain: `${move} / ${vol} = ${answer.toFixed(4)} vol points. At ${vol}% vol, a 1% move is about ${(100 / vol).toFixed(2)} vol points, so the ${move}% move is ${move} times that.`,
+    explain: `${move} / ${vol} = ${answer.toFixed(2)} vol points. At ${vol}% vol, a 1% move is about ${(1 / (vol / 100)).toFixed(2)} vol points, so the ${move}% move is ${move} times that.`,
     anchor: 'Divide the percentage move by the percentage vol. At 20 vol a 1% move is 5 vol points; at 10 vol it is 10.',
-    citation: 'README section 1.5.',
+    citation: 'Manual, Math and units',
     signature: 'vol|price-move-to-vol-points',
     answer,
-    decimals: 4,
-    tolerance: 0,
+    decimals: 2,
+    tolerance: 0.01,
   };
 }
 
-function deltaStrike(rng: Rng, tier: Tier): NumericQuestion {
+function deltaStrike(rng: Rng): NumericQuestion {
   const index = rng.pick(INDICES);
   const spot = index.level;
   const vol = rng.pick(VOLS);
@@ -141,12 +139,11 @@ function deltaStrike(rng: Rng, tier: Tier): NumericQuestion {
     generatorId: 'delta-strike',
     category: 'math',
     subgroup: 'vol',
-    tier,
     prompt: `The ${index.name} is at ${spot.toLocaleString('en-US')}, ${tenor.label} implied vol is ${vol}%. Where is the ${Math.round(delta * 100)}-delta ${isPut ? 'put' : 'call'} strike, to 1 decimal place?`,
-    context: `K ≈ S x exp(±z σ√T) with z = Φ⁻¹(${delta}). Round numbers: Φ⁻¹(0.25) ≈ 0.67, Φ⁻¹(0.10) ≈ 1.28.`,
+    context: `K ≈ S x exp(±z σ√T) with z = Φ⁻¹(${delta}). z values: 0.10→1.2816, 0.15→1.0364, 0.20→0.8416, 0.25→0.6745, 0.30→0.5244, 0.40→0.2533.`,
     explain: `σ√T = ${(vol / 100).toFixed(4)} x √${tenor.years.toFixed(4)} = ${((vol / 100) * Math.sqrt(tenor.years)).toFixed(4)}. z = Φ⁻¹(${delta}) = ${Math.abs(invNorm(delta)).toFixed(4)}. The wing sits ${Math.abs(Math.abs(invNorm(delta)) * (vol / 100) * Math.sqrt(tenor.years) * 100).toFixed(2)}% ${isPut ? 'below' : 'above'} spot, so K ≈ ${answer.toFixed(1)}.`,
     anchor: 'A 25-delta option sits about 0.67 σ√T from spot; a 10-delta about 1.28 σ√T. Tenor scales that distance by √T, so the same delta is much closer to spot in the front.',
-    citation: 'README section 1.5.',
+    citation: 'Manual, Math and units',
     signature: `vol|delta-strike-${Math.round(delta * 100)}-${isPut ? 'put' : 'call'}`,
     answer,
     decimals: 1,
@@ -154,7 +151,7 @@ function deltaStrike(rng: Rng, tier: Tier): NumericQuestion {
   };
 }
 
-function breakevenVol(rng: Rng, tier: Tier): NumericQuestion {
+function breakevenVol(rng: Rng): NumericQuestion {
   const theta = rng.pick([5_000, 10_000, 20_000, 25_000, 50_000] as const);
   const gamma = rng.pick([50_000, 100_000, 200_000, 250_000, 500_000] as const);
   // sigma_be = sqrt(2 * theta / gamma), expressed in annualised vol points by
@@ -168,21 +165,20 @@ function breakevenVol(rng: Rng, tier: Tier): NumericQuestion {
     generatorId: 'breakeven-vol',
     category: 'math',
     subgroup: 'vol',
-    tier,
     prompt: `Your book has gamma ${gamma.toLocaleString('en-US')} and theta ${theta.toLocaleString('en-US')} per day, both in dollars per 1 percentage point. What annualised realised vol do you need to break even, in vol points to 2 decimal places? Assume 252 trading days.`,
-    context: 'σ_be = sqrt(2 Θ / Γ) per unit time. Convert the daily figure to annualised by multiplying by sqrt(252).',
-    explain: `Daily breakeven = sqrt(2 x ${theta.toLocaleString('en-US')} / ${gamma.toLocaleString('en-US')}) = ${dailyVol.toFixed(6)}. Annualised = ${dailyVol.toFixed(6)} x sqrt(252) x 100 = ${annualPct.toFixed(2)} vol points.`,
+    context: 'σ_be = sqrt(2 Θ / Γ) per unit time. Convert the daily figure to annualised by multiplying by sqrt(252) = 15.87.',
+    explain: `Daily breakeven = sqrt(2 x ${theta.toLocaleString('en-US')} / ${gamma.toLocaleString('en-US')}) = ${dailyVol.toFixed(6)}. Annualised = ${dailyVol.toFixed(6)} x 15.87 x 100 = ${annualPct.toFixed(2)} vol points.`,
     anchor: 'Breakeven vol rises with the square root of the theta/gamma ratio. Doubling theta raises the breakeven by about 41%.',
-    citation: 'README section 1.5.',
+    citation: 'Manual, Math and units',
     signature: 'vol|breakeven',
     answer: annualPct,
     decimals: 2,
-    tolerance: 0,
+    tolerance: 0.01,
     unit: 'vol pts',
   };
 }
 
-function forwardVol(rng: Rng, tier: Tier): NumericQuestion {
+function forwardVol(rng: Rng): NumericQuestion {
   const t1 = rng.pick([0.25, 0.5, 1] as const);
   const t2 = rng.pick([2, 3] as const);
   const s1 = rng.pick([12, 14, 16, 18, 20, 22] as const);
@@ -197,12 +193,11 @@ function forwardVol(rng: Rng, tier: Tier): NumericQuestion {
     generatorId: 'forward-vol',
     category: 'derivatives',
     subgroup: 'exotic',
-    tier,
     prompt: `The ${t1 * 12}-month implied vol is ${s1}% and the ${t2}-year implied vol is ${s2}%. What is the forward vol between ${t1 * 12} months and ${t2} years, to 2 decimal places?`,
     context: 'σ²_{t1→t2} = (σ²_{0→t2} t2 − σ²_{0→t1} t1) / (t2 − t1).',
     explain: `σ² = (${s2}² x ${t2} − ${s1}² x ${t1}) / (${t2} − ${t1}) = ${variance.toFixed(4)}, so σ = ${answer.toFixed(2)}%.`,
     anchor: 'Work in variance, not vol. Average variances weighted by time, then take the square root at the end.',
-    citation: 'README sections 1.5 and 4.2.',
+    citation: 'Manual, Math and units',
     signature: 'vol|forward-vol',
     answer,
     decimals: 2,
@@ -211,7 +206,7 @@ function forwardVol(rng: Rng, tier: Tier): NumericQuestion {
   };
 }
 
-function volBasis(rng: Rng, tier: Tier): NumericQuestion {
+function volBasis(rng: Rng): NumericQuestion {
   const onshore = rng.pick([16, 18, 20, 22, 24] as const);
   const basis = rng.pick([-1.5, -1, -0.75, -0.5, 0.5, 0.75, 1, 1.5] as const);
   const offshore = roundTo(onshore + basis, 2);
@@ -225,12 +220,11 @@ function volBasis(rng: Rng, tier: Tier): NumericQuestion {
     generatorId: 'vol-basis-pnl',
     category: 'derivatives',
     subgroup: 'exotic',
-    tier,
     prompt: `You are hedged with the onshore contract at ${onshore}% vol, but your option is marked to offshore vol at ${offshore}%. Your vega is ${vega.toLocaleString('en-US')} per vol point. How much PnL does the basis cost you, in dollars to 2 decimal places?`,
     context: 'The basis is the vol difference between the two venues for the same underlying, such as A50 on SGX versus CSI 300 onshore.',
     explain: `The basis is ${basis} vol points. Cost = vega x |basis| = ${vega.toLocaleString('en-US')} x ${Math.abs(basis)} = ${answer.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}. The basis is a first-order risk because you hedge in one venue and mark in another.`,
     anchor: 'A cross-market vol basis is a persistent, quotable cost. Budget for it rather than treating it as noise.',
-    citation: 'README section 4.2, Basis and cross-market vol.',
+    citation: 'Manual, Exotic options, basis and cross-market vol',
     signature: 'vol|basis-pnl',
     answer,
     decimals: 2,
@@ -244,7 +238,6 @@ export const vegaGenerators: Generator[] = [
     id: 'vega-pnl',
     category: 'math',
     subgroup: 'vol',
-    tier: 1,
     about: 'Vega PnL from vega quoted per vol point.',
     generate: vegaPnl,
   },
@@ -252,7 +245,6 @@ export const vegaGenerators: Generator[] = [
     id: 'price-move-to-vol',
     category: 'math',
     subgroup: 'vol',
-    tier: 2,
     about: 'Express a percentage price move in vol points.',
     generate: priceMoveToVolPoints,
   },
@@ -260,7 +252,6 @@ export const vegaGenerators: Generator[] = [
     id: 'delta-strike',
     category: 'math',
     subgroup: 'vol',
-    tier: 3,
     about: 'Approximate the strike for a given delta.',
     generate: deltaStrike,
   },
@@ -268,7 +259,6 @@ export const vegaGenerators: Generator[] = [
     id: 'breakeven-vol',
     category: 'math',
     subgroup: 'vol',
-    tier: 4,
     about: 'Annualised breakeven vol from gamma and theta.',
     generate: breakevenVol,
   },
@@ -276,7 +266,6 @@ export const vegaGenerators: Generator[] = [
     id: 'forward-vol',
     category: 'derivatives',
     subgroup: 'exotic',
-    tier: 3,
     about: 'Forward vol between two tenors from spot vols.',
     generate: forwardVol,
   },
@@ -284,7 +273,6 @@ export const vegaGenerators: Generator[] = [
     id: 'vol-basis-pnl',
     category: 'derivatives',
     subgroup: 'exotic',
-    tier: 4,
     about: 'Cost of a cross-market vol basis, such as A50 versus CSI 300.',
     generate: volBasis,
   },
