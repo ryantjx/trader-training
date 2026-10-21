@@ -1,3 +1,4 @@
+import { hasResponse } from '../../lib/responses';
 import type { Question, Response } from '../../lib/types';
 
 /** Split a prompt on newlines so multi-line question data renders as rows. */
@@ -33,10 +34,7 @@ export function QuestionCard({
   onSubmit,
   secondsLeft,
 }: QuestionCardProps) {
-  const hasAnswer =
-    (response.kind === 'numeric' && response.value !== null) ||
-    (response.kind === 'choice' && response.optionId !== null) ||
-    (response.kind === 'ordering' && response.order.length === (question.kind === 'ordering' ? question.items.length : 0));
+  const hasAnswer = hasResponse(question, response);
 
   return (
     <div className="tt-card">
@@ -74,6 +72,16 @@ export function QuestionCard({
             order={response.kind === 'ordering' ? response.order : question.items.map((i) => i.id)}
             onChange={(order) => onChange({ kind: 'ordering', order })}
             disabled={locked}
+          />
+        ) : null}
+
+        {question.kind === 'text' ? (
+          <TextEntry
+            value={response.kind === 'text' ? response.text : ''}
+            onChange={(text) => onChange({ kind: 'text', text })}
+            disabled={locked}
+            placeholder={question.placeholder}
+            onSubmit={onSubmit}
           />
         ) : null}
       </div>
@@ -177,6 +185,46 @@ function ChoiceEntry({
         </label>
       ))}
     </div>
+  );
+}
+
+function TextEntry({
+  value,
+  onChange,
+  disabled,
+  placeholder,
+  onSubmit,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  disabled: boolean;
+  placeholder?: string;
+  onSubmit: () => void;
+}) {
+  // No local state: the draft lives in the response object, so the answer
+  // survives a re-render and is what the marker sees. Spelling aid is off,
+  // because a browser autocorrect would hide the recall error being tested.
+  return (
+    <label className="tt-numeric" style={{ display: 'block' }}>
+      <span style={{ display: 'block', marginBottom: '0.35rem' }}>
+        Your answer — type the full name
+      </span>
+      <input
+        type="text"
+        value={value}
+        disabled={disabled}
+        placeholder={placeholder ?? 'Company name'}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && value.trim() !== '' && !disabled) onSubmit();
+        }}
+        autoComplete="off"
+        autoCapitalize="words"
+        autoCorrect="off"
+        spellCheck={false}
+        style={{ padding: '0.4rem 0.6rem', minWidth: '18rem', fontSize: '1rem' }}
+      />
+    </label>
   );
 }
 

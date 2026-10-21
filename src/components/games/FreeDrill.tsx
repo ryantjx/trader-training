@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { generatorsForCategory, generatorsForQuiz } from '../../lib/generators/registry';
 import { freeRng } from '../../lib/seed';
 import { mark } from '../../lib/marking';
+import { initialResponse } from '../../lib/responses';
 import { createLocalStore } from '../../lib/storage';
 import { review } from '../../lib/srs';
 import type { Category, Question, Response, Subgroup, Tier } from '../../lib/types';
@@ -50,9 +51,7 @@ export function FreeDrill({ category, subgroup, tier = 2 }: FreeDrillProps) {
 
   useEffect(() => {
     if (!question) return;
-    if (question.kind === 'numeric') setResponse({ kind: 'numeric', value: null });
-    else if (question.kind === 'choice') setResponse({ kind: 'choice', optionId: null });
-    else setResponse({ kind: 'ordering', order: question.items.map((i) => i.id) });
+    setResponse(initialResponse(question));
     setResult(null);
   }, [question]);
 

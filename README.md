@@ -6,7 +6,7 @@ The content is organised into **three groups** — **Math**, **Markets** and **A
 
 ```text
 1 Math              arithmetic and pricing relationships        -> 21 generators
-2 Markets           microstructure, tickers, market knowledge   -> 14 generators
+2 Markets           microstructure, tickers, market knowledge   -> 15 generators
 3 Asia Derivatives   listed contracts and OTC exotics           -> 13 generators
 ```
 
@@ -215,7 +215,7 @@ them, so a **one-page market-structure summary per market** supports the quizzes
 | Quiz | Generators |
 | --- | --- |
 | Microstructure | `session-open-at-time`, `stamp-duty`, `clearing-house`, `sgx-closing-routine` |
-| Tickers | `ticker-name`, `ticker-sector`, `ticker-cap-band`, `ticker-index-membership`, `ticker-liquidity`, `ticker-hedgeability` |
+| Tickers | `ticker-name`, `ticker-name-typed`, `ticker-sector`, `ticker-cap-band`, `ticker-index-membership`, `ticker-liquidity`, `ticker-hedgeability` |
 | Market knowledge | `calendar-event`, `access-channel`, `central-bank`, `index-construction` |
 
 ## 2.1 Market microstructure
@@ -287,9 +287,11 @@ Reviewed quarterly; SGX purges all resting orders for affected securities on tra
 
 **What to do.** Asian stocks generally go by numbers — memorise the ticker, then build outward from it. Test the ticker against the company name, then layer sector, market cap band, index membership and liquidity.
 
+**Codes.** The desk quotes a ticker with a venue suffix, and so does this drill: `D05 SP` Singapore, `9984 JT` Tokyo, `700 HK` Hong Kong, `BHP AU` Australia. The suffix is part of the answer, because `5 HK` is HSBC while `700 HK` is Tencent — the number alone decides nothing.
+
 **Layered difficulty.** Each question can be asked at one of five levels, so the same ticker dataset supports both a warm-up and a hard round:
 
-1. **Ticker → company name** (e.g. `D05` → DBS).
+1. **Ticker → company name** (e.g. `D05 SP` → DBS, `9984 JT` → SoftBank Group), asked twice: multiple choice, where the name is recognised among four listed names, and **free text**, where it is produced from the code alone. The free-text version folds case, punctuation and corporate suffixes, so `softbank group corp.` marks correct against `SoftBank Group`, and it forgives one typo in a name of eight characters or more. It does not forgive a short name: `AIG` is not `AIA`, and `DBX` is not `DBS`.
 2. **Ticker → sector** (Financials, Real Estate/REITs, Industrials, Telecom, Consumer, Transport, Tech, Utilities).
 3. **Ticker → market cap band** (mega > S\$100bn, large S\$10–100bn, mid S\$2–10bn, small < S\$2bn).
 4. **Ticker → index membership and approximate weight** (STI, HSI, TOPIX, Nikkei 225, ASX 200).
@@ -318,7 +320,7 @@ Reviewed quarterly; SGX purges all resting orders for affected securities on tra
 | AJBU | Keppel DC REIT | REIT | 5.8 | ~1% | ~33 |
 | AWX | AEM Holdings | Tech | 3.1 | <1% | ~45 |
 
-The dataset should be extended to cover HK, JP and AU names on the same schema, and refreshed at each index review. Note the case that makes the liquidity level worth testing: **AEM** is small (~S\$3bn) but trades ~S\$45m/day, so market cap alone misleads.
+`src/data/tickers.json` also carries HK, JP and AU names on the same schema, so the naming drill covers all four venues. Those rows hold listing facts only — code, name, sector, venue. Their market-cap, turnover and borrow fields are `null` because no source has been checked, and every generator that needs one skips null rows: the cap-band and liquidity drills therefore ask SGX names only, and the STI-membership and hedgeability drills are restricted to Singapore listings. Add the numbers when a source has been checked, not before. Refresh at each index review. Note the case that makes the liquidity level worth testing: **AEM** is small (~S\$3bn) but trades ~S\$45m/day, so market cap alone misleads.
 
 **Which tickers matter for exotics.** The desk is most often asked for paper on the names where retail demand and borrow availability meet. In Singapore, the **banks (D05, O39, U11)** and the large **S-REITs (C38U, A17U, M44U, ME8U, AJBU)**, because they are the only names with enough liquidity to hedge at size. In Hong Kong, the **H-share and China-large-cap complex** that underpins HSI-linked structures (for example 700 Tencent, 9988 Alibaba, 939 CCB, 1299 AIA). In Korea, the **large-cap technology and battery names** referenced by ELS. In Japan, the **Nikkei-heavy exporters** whose volatility drives Nikkei autocallables and cliquets. In Australia, the **ASX 200 top-20** names referenced by index and single-name structures.
 

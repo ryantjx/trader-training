@@ -73,6 +73,23 @@ export const someGenerators: Generator[] = [
 Add a generator by writing the function, adding it to the list in its file, and spreading that list
 in `registry.ts`. Nothing else needs to change.
 
+A question is one of four kinds, and a renderer switches on it exhaustively:
+
+| `kind` | Answer carried | Marked by |
+| --- | --- | --- |
+| `numeric` | `answer`, `decimals`, `tolerance` | rounding at `decimals`, or the tolerance band |
+| `choice` | `options`, `answerId` | id equality |
+| `ordering` | `items`, `answerOrder` | exact sequence |
+| `text` | `answer` (canonical), `accept` (all variants) | `markText()` in `marking.ts` |
+
+The `text` kind exists for the ticker naming drill. It folds case, punctuation, ampersands and a
+short list of corporate suffixes before comparing, and accepts a one-edit difference only when both
+strings are at least eight characters, so a transposition in a long name costs nothing while `DBX`
+is still not `DBS`. Every mode resets its input through `initialResponse()` in `responses.ts` — use
+it rather than an if-chain, which is how a numeric answer used to leak into a choice question.
+`tests/generators.test.ts` asserts every question kind gets a matching empty response and that an
+untouched question is never already correct.
+
 ### Routes
 
 Every quiz is its own page. The route structure mirrors the sidebar exactly:
@@ -151,6 +168,11 @@ Fields that cannot be verified are omitted or flagged rather than guessed:
 - `fx.json` has `verified: false`, and the one generator that would ask you to recall a level
   refuses to run while that is the case. `registry.ts` marks it unavailable and the About page shows
   why. Conversion and triangulation questions supply the rate in the question and are always fair.
+- `tickers.json` carries HK, JP and AU names beside the SGX block, but only the SGX rows have market
+  cap, turnover, STI weight and borrow. The others hold `null` in those fields, and the generators
+  skip null rows rather than guess: cap-band and liquidity ask SGX names only, STI membership and
+  hedgeability are restricted to Singapore listings. If you add a venue, add the listing facts and
+  leave the numerics `null` until a source has been checked.
 
 ## Testing
 
@@ -164,6 +186,11 @@ npm test
 - no `NaN`, no `Infinity`, exactly one correct option, well-formed answer keys;
 - no numeric answer sits on a rounding boundary;
 - no unavailable generator appears in the daily set;
+- every question kind gets a matching empty response from `initialResponse()`, and an untouched
+  question is never marked correct;
+- free-text marking folds case, punctuation and suffixes, always accepts the canonical name and
+  every alias, never accepts another listed company, and forgives one typo only above eight
+  characters;
 - put-call parity never produces a negative option value or breaches its no-arbitrage bounds, and
   holds exactly to the penny;
 - each index level is within its own order of magnitude, so a name can never be paired with another
